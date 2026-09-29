@@ -1,0 +1,96 @@
+/* On-screen touch controls: thumbs rest at the bottom corners, above/below the letterboxed arena. */
+
+.touch {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  pointer-events: none;
+  z-index: 5;
+  --btn: clamp(52px, 13vmin, 84px);
+}
+
+.touch__cluster {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.touch__cluster--right {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.touch__guns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.touch-btn {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  width: var(--btn);
+  height: var(--btn);
+  display: grid;
+  place-items: center;
+  background: url('../../assets/png/default/ui/controls/button_round_normal.png') center / contain no-repeat;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.touch-btn[data-pressed='true'] {
+  background-image: url('../../assets/png/default/ui/controls/button_round_pressed.png');
+  transform: scale(0.94);
+}
+
+.touch-btn img {
+  width: 56%;
+  pointer-events: none;
+}
+
+.touch-btn--forward {
+  --btn: clamp(66px, 17vmin, 100px);
+}
+
+.touch-btn--gun {
+  width: calc(var(--btn) * 0.85);
+  height: calc(var(--btn) * 0.85);
+}
+
+.touch-btn:focus-visible {
+  outline: 3px solid #ffd35a;
+  outline-offset: 2px;
+}
+
+/* Portrait phones: the arena is small; suggest landscape. */
+.touch-hint {
+  display: none;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(4 14 22 / 0.8);
+  color: #fdf1d3;
+  font: 600 12px 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  pointer-events: none;
+  z-index: 6;
+}
+
+@media (orientation: portrait) and (pointer: coarse) {
+  .touch-hint {
+    display: block;
+  }
+}

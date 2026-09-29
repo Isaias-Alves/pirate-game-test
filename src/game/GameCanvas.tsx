@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Hud } from '../ui/Hud';
 import { LiveStatus } from '../ui/LiveStatus';
 import { PauseOverlay } from '../ui/PauseOverlay';
+import { TouchControls } from '../ui/TouchControls';
+import { wantsTouchControls } from '../ui/touchSupport';
 import '../ui/hud.css';
 import { loadGameAssets } from './assets';
 import { Game } from './Game';
@@ -20,6 +22,7 @@ export function GameCanvas() {
   const [status, setStatus] = useState<Status>('loading');
   const [game, setGame] = useState<Game | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [touch] = useState(wantsTouchControls);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -30,10 +33,16 @@ export function GameCanvas() {
     const life = { cancelled: false, destroyed: false };
     const isCancelled = () => life.cancelled;
     let initialised = false;
+    // The host can change size without a window resize (e.g. the HUD row appearing), so observe it directly.
+    const observer = new ResizeObserver(() => {
+      if (initialised && !life.destroyed) app.renderer.resize(host.clientWidth, host.clientHeight);
+    });
+    observer.observe(host);
 
     const teardown = () => {
       if (life.destroyed) return;
       life.destroyed = true;
+      observer.disconnect();
       current?.dispose();
       current = undefined;
       exposeGame(undefined);
@@ -44,7 +53,8 @@ export function GameCanvas() {
       try {
         setStatus('loading');
         await app.init({
-          resizeTo: host,
+          width: host.clientWidth,
+          height: host.clientHeight,
           background: '#0b2a3d',
           antialias: true,
           resolution: window.devicePixelRatio,
@@ -79,6 +89,7 @@ export function GameCanvas() {
 
     return () => {
       life.cancelled = true;
+      observer.disconnect();
       setGame(null);
       // If init/loading is still in flight the async block tears down when it resumes.
       if (initialised) teardown();
@@ -103,6 +114,12 @@ export function GameCanvas() {
               Retry
             </button>
           </div>
+        )}
+        {game && touch && (
+          <>
+            <p className="touch-hint">Rotate your device for a bigger arena</p>
+            <TouchControls game={game} />
+          </>
         )}
         {game && <PauseOverlay game={game} />}
       </div>

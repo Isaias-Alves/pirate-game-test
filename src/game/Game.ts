@@ -1,7 +1,7 @@
 import type { Application, Ticker } from 'pixi.js';
 import type { GameTextures } from './assets';
 import type { GameConfig } from './gameConfig';
-import { emptyInput } from './input/InputState';
+import { emptyInput, type InputState } from './input/InputState';
 import { KeyboardInput } from './input/KeyboardInput';
 import { MatchStore, type MatchPhase, type MatchResult, type MatchSnapshot } from './matchStore';
 import { Renderer } from './render/Renderer';
@@ -56,6 +56,16 @@ export class Game {
     return () => {
       this.endListeners.delete(listener);
     };
+  }
+
+  /**
+   * Sets a control from a non-keyboard source (touch). Presses are only accepted while playing, so
+   * nothing is queued during a pause or after the end. Releases are always accepted.
+   */
+  setControl(action: keyof InputState, held: boolean): boolean {
+    if (held && !this.isPlaying()) return false;
+    this.input[action] = held;
+    return true;
   }
 
   pause(cause: 'manual' | 'focus' = 'manual'): void {

@@ -1,5 +1,9 @@
 import { Application } from 'pixi.js';
 import { useEffect, useRef, useState } from 'react';
+import { Hud } from '../ui/Hud';
+import { LiveStatus } from '../ui/LiveStatus';
+import { PauseOverlay } from '../ui/PauseOverlay';
+import '../ui/hud.css';
 import { loadGameAssets } from './assets';
 import { Game } from './Game';
 import { gameConfig } from './gameConfig';
@@ -14,6 +18,7 @@ type Status = 'loading' | 'ready' | 'error';
 export function GameCanvas() {
   const hostRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>('loading');
+  const [game, setGame] = useState<Game | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -21,7 +26,7 @@ export function GameCanvas() {
     if (!host) return;
 
     const app = new Application();
-    let game: Game | undefined;
+    let current: Game | undefined;
     const life = { cancelled: false, destroyed: false };
     const isCancelled = () => life.cancelled;
     let initialised = false;
@@ -29,8 +34,8 @@ export function GameCanvas() {
     const teardown = () => {
       if (life.destroyed) return;
       life.destroyed = true;
-      game?.dispose();
-      game = undefined;
+      current?.dispose();
+      current = undefined;
       exposeGame(undefined);
       if (initialised) app.destroy({ removeView: true }, { children: true });
     };
@@ -58,8 +63,9 @@ export function GameCanvas() {
           return;
         }
 
-        game = new Game(app, textures, gameConfig);
-        exposeGame(game);
+        current = new Game(app, textures, gameConfig);
+        exposeGame(current);
+        setGame(current);
         setStatus('ready');
       } catch (err) {
         console.error('Failed to start the game', err);
@@ -73,22 +79,34 @@ export function GameCanvas() {
 
     return () => {
       life.cancelled = true;
+      setGame(null);
       // If init/loading is still in flight the async block tears down when it resumes.
       if (initialised) teardown();
     };
   }, [attempt]);
 
   return (
-    <div ref={hostRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {status === 'loading' && <p style={overlay}>Loading…</p>}
-      {status === 'error' && (
-        <div style={overlay} role="alert">
-          <p>Could not load game assets.</p>
-          <button type="button" onClick={() => { setAttempt((n) => n + 1); }}>
-            Retry
-          </button>
-        </div>
-      )}
+    <div className="match">
+      {game ? <Hud game={game} /> : <div />}
+      <div className="match__arena">
+        <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
+        {status === 'loading' && <p style={overlay}>Loading…</p>}
+        {status === 'error' && (
+          <div style={overlay} role="alert">
+            <p>Could not load game assets.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setAttempt((n) => n + 1);
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+        {game && <PauseOverlay game={game} />}
+      </div>
+      {game && <LiveStatus game={game} />}
     </div>
   );
 }

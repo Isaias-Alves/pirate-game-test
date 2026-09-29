@@ -54,6 +54,13 @@ export interface GameConfig {
     /** Types spawned first, in order, so both appear even in a short match. Weighted random afterwards. */
     opening: EnemyKind[];
   };
+  /** Presentation thresholds tied to gameplay values. */
+  feedback: {
+    /** Health fractions below which a ship swaps to its next damaged sprite (3 thresholds = 4 stages). */
+    damageStageThresholds: [number, number, number];
+    /** Fraction of max health at or below which the player is warned. */
+    lowHealthFraction: number;
+  };
   ai: {
     /** How far ahead (world units) an enemy looks for islands to steer around. */
     islandLookahead: number;
@@ -102,6 +109,7 @@ export const gameConfig: GameConfig = {
     maxAttempts: 30,
     opening: ['chaser', 'shooter'],
   },
+  feedback: { damageStageThresholds: [0.75, 0.5, 0.25], lowHealthFraction: 0.3 },
   ai: { islandLookahead: 170, islandMargin: 26 },
   player: {
     maxHealth: 100,

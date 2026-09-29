@@ -1,0 +1,186 @@
+/* HUD, pause overlay and shared match-screen styles. Sprites come from the provided UI atlas. */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.match {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.match__arena {
+  position: relative;
+  min-height: 0;
+}
+
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 8px 22px;
+  background: linear-gradient(#071b28, #0b2a3d);
+  border-bottom: 2px solid #5a3a1c;
+  color: #fdf1d3;
+}
+
+.hud-health {
+  position: relative;
+  width: clamp(150px, 26vw, 256px);
+  aspect-ratio: 256 / 48;
+  margin-right: auto;
+}
+
+.hud-health > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+.hud-health__fill {
+  transition: clip-path 0.18s ease-out;
+}
+
+.hud-health__icon {
+  inset: auto auto auto -14px;
+  width: 20% !important;
+  height: auto !important;
+  aspect-ratio: 1;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+}
+
+.hud-counter {
+  position: relative;
+  width: clamp(104px, 18vw, 160px);
+  aspect-ratio: 160 / 56;
+  display: grid;
+  place-items: center;
+}
+
+.hud-counter > img {
+  user-select: none;
+}
+
+.hud-counter__panel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hud-counter__icon {
+  position: absolute;
+  left: 8%;
+  top: 50%;
+  width: 26%;
+  transform: translateY(-50%);
+}
+
+.hud-counter__value {
+  position: relative;
+  margin-left: 26%;
+  font: 700 clamp(18px, 3.4vw, 26px) / 1 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 0 #3a230f;
+}
+
+.hud-counter--warn .hud-counter__value {
+  color: #ff8f7a;
+}
+
+.hud-pause {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  background: url('../../assets/png/default/ui/controls/button_round_normal.png') center / contain no-repeat;
+  display: grid;
+  place-items: center;
+}
+
+.hud-pause:hover {
+  background-image: url('../../assets/png/default/ui/controls/button_round_hover.png');
+}
+
+.hud-pause:active {
+  background-image: url('../../assets/png/default/ui/controls/button_round_pressed.png');
+}
+
+.hud-pause img {
+  width: 60%;
+  pointer-events: none;
+}
+
+.hud-pause:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.hud-pause:focus-visible,
+.btn-primary:focus-visible {
+  outline: 3px solid #ffd35a;
+  outline-offset: 3px;
+}
+
+/* Pause overlay */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(4 14 22 / 0.62);
+  z-index: 10;
+}
+
+.overlay__panel {
+  width: min(88vw, 360px);
+  padding: 44px 40px 40px;
+  text-align: center;
+  color: #fdf1d3;
+  background: center / 100% 100% no-repeat;
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+}
+
+.overlay__panel h2 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  text-shadow: 0 2px 0 #3a230f;
+}
+
+.overlay__panel p {
+  margin: 0 0 20px;
+  line-height: 1.4;
+}
+
+.overlay__hint {
+  margin: 14px 0 0 !important;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.btn-primary {
+  appearance: none;
+  border: 0;
+  width: 220px;
+  height: 76px;
+  color: #3a230f;
+  font: 800 22px / 1 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  background: center / 100% 100% no-repeat;
+  cursor: pointer;
+}

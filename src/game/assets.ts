@@ -30,6 +30,11 @@ const tileUrls = import.meta.glob<string>('../../assets/png/default/tiles/tile_7
   query: '?url',
   import: 'default',
 });
+const hudUrls = import.meta.glob<string>('../../assets/png/default/ui/hud/enemy_health_*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
 const tileSheetUrls = import.meta.glob<string>('../../assets/tilesheet/tiles_sheet.png', {
   eager: true,
   query: '?url',
@@ -55,6 +60,8 @@ export interface GameTextures {
   fire: Texture[];
   water: Texture;
   islands: { sand: Texture; grass: Texture };
+  /** In-world health bar art (draw order: frame, then fill clipped from the left to `fillRect`). */
+  healthBar: { frame: Texture; green: Texture; red: Texture; fillRect: { x: number; y: number; w: number; h: number } };
 }
 
 export type LoadProgress = (fraction: number) => void;
@@ -69,6 +76,9 @@ export async function loadGameAssets(onProgress: LoadProgress = () => undefined)
     ['cannon_ball.png', url(partUrls, 'cannon_ball.png')],
     ...effectFiles.map((f): [string, string] => [f, url(effectUrls, f)]),
     ['tile_73.png', url(tileUrls, 'tile_73.png')],
+    ['enemy_health_frame.png', url(hudUrls, 'enemy_health_frame.png')],
+    ['enemy_health_fill_green.png', url(hudUrls, 'enemy_health_fill_green.png')],
+    ['enemy_health_fill_red.png', url(hudUrls, 'enemy_health_fill_red.png')],
     ['tiles_sheet.png', url(tileSheetUrls, 'tiles_sheet.png')],
   ];
 
@@ -102,6 +112,13 @@ export async function loadGameAssets(onProgress: LoadProgress = () => undefined)
     explosion: ['explosion_1.png', 'explosion_2.png', 'explosion_3.png'].map(get),
     fire: ['fire_1.png', 'fire_2.png'].map(get),
     water: get('tile_73.png'),
+    // fill_rect from the `ui` metadata of enemy_health_frame in ui_sheet.json (logical pixels).
+    healthBar: {
+      frame: get('enemy_health_frame.png'),
+      green: get('enemy_health_fill_green.png'),
+      red: get('enemy_health_fill_red.png'),
+      fillRect: { x: 24, y: 12, w: 112, h: 15 },
+    },
     // Regions of tiles_sheet.png (64px tiles): plain sand blob and the grassy island.
     islands: { sand: crop(0, 0, 192, 192), grass: crop(320, 0, 256, 256) },
   };

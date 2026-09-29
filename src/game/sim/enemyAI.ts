@@ -79,7 +79,7 @@ function resolveContact(sim: Simulation, e: Enemy): void {
   sim.damagePlayer(sim.config.chaser.contactDamage, e.x, e.y);
   e.health = 0;
   e.alive = false;
-  sim.pushEvent({ type: 'destroyed', x: e.x, y: e.y, target: 'enemy' });
+  sim.pushEvent({ type: 'destroyed', x: e.x, y: e.y, target: 'enemy', targetId: e.id });
 }
 
 /** Keeps live ships from overlapping each other and from sitting on top of the player. */

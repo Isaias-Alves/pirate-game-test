@@ -99,8 +99,8 @@ export class Game {
     if (this.phase !== 'playing') return;
     const { fixedStep } = this.config.simulation;
     for (let t = 0; t < seconds && this.isPlaying(); t += fixedStep) this.step(fixedStep);
-    this.sim.drainEvents();
-    this.renderer.update();
+    this.renderer.handleEvents(this.sim.drainEvents());
+    this.renderer.update(0);
     this.publish();
   }
 
@@ -120,10 +120,10 @@ export class Game {
         this.step(fixedStep);
         this.accumulator -= fixedStep;
       }
-      // Effects are wired up in phase 6; drain so the queue cannot grow unbounded.
-      this.sim.drainEvents();
+      this.renderer.handleEvents(this.sim.drainEvents());
     }
-    this.renderer.update();
+    // Cosmetic timers (flash, shake, effects) run on wall time and freeze while paused.
+    this.renderer.update(this.phase === 'paused' ? 0 : ticker.deltaMS / 1000);
     this.publish();
   };
 

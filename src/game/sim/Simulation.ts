@@ -4,7 +4,7 @@ import { clampToArena, pushOutOfCircle, segmentHitsCircle } from './collision';
 import { stepEnemies } from './enemyAI';
 import { createRng, type Rng } from './rng';
 import { stepSpawner } from './spawner';
-import type { Enemy, Owner, Projectile, SimEvent } from './types';
+import { PLAYER_ID, type Enemy, type Owner, type Projectile, type SimEvent } from './types';
 
 export interface PlayerShip {
   x: number;
@@ -244,10 +244,10 @@ export class Simulation {
   damageEnemy(e: Enemy, amount: number, x: number, y: number): void {
     if (!e.alive) return;
     e.health = Math.max(0, e.health - amount);
-    this.events.push({ type: 'hit', x, y, target: 'enemy' });
+    this.events.push({ type: 'hit', x, y, target: 'enemy', targetId: e.id });
     if (e.health === 0) {
       e.alive = false;
-      this.events.push({ type: 'destroyed', x: e.x, y: e.y, target: 'enemy' });
+      this.events.push({ type: 'destroyed', x: e.x, y: e.y, target: 'enemy', targetId: e.id });
     }
   }
 
@@ -255,10 +255,10 @@ export class Simulation {
     const p = this.player;
     if (!p.alive) return;
     p.health = Math.max(0, p.health - amount);
-    this.events.push({ type: 'hit', x, y, target: 'player' });
+    this.events.push({ type: 'hit', x, y, target: 'player', targetId: PLAYER_ID });
     if (p.health === 0) {
       p.alive = false;
-      this.events.push({ type: 'destroyed', x: p.x, y: p.y, target: 'player' });
+      this.events.push({ type: 'destroyed', x: p.x, y: p.y, target: 'player', targetId: PLAYER_ID });
     }
   }
 }

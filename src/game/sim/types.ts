@@ -1,3 +1,6 @@
+/** Id used in events for the player's ship (enemy ids start at 1). */
+export const PLAYER_ID = 0;
+
 export type Owner = 'player' | 'enemy';
 
 export interface Projectile {
@@ -34,6 +37,6 @@ export interface Enemy {
 /** One-shot facts the renderer/audio turn into effects. Drained each frame via Simulation.drainEvents(). */
 export type SimEvent =
   | { type: 'shot'; x: number; y: number; angle: number; owner: Owner }
-  | { type: 'hit'; x: number; y: number; target: 'player' | 'enemy' }
+  | { type: 'hit'; x: number; y: number; target: 'player' | 'enemy'; targetId: number }
   | { type: 'splash'; x: number; y: number }
-  | { type: 'destroyed'; x: number; y: number; target: 'player' | 'enemy' };
+  | { type: 'destroyed'; x: number; y: number; target: 'player' | 'enemy'; targetId: number };

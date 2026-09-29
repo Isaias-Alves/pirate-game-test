@@ -93,7 +93,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 - [x] Fase 3 — combate (front + 3-shot broadsides, per-weapon cooldowns, projectile lifecycle, swept hit test; 17 unit tests)
 - [x] Fase 4 — inimigos + spawner (Chaser, Shooter, island steering, validated spawn points, opening sequence; 29 unit tests)
 - [x] Fase 5 — ciclo da partida (score, timer, end by time/death, freeze after end, pause manual+auto with explicit resume, restart, MatchStore; 38 unit tests + browser check)
-- [ ] Fase 6 — HUD + feedback
+- [x] Fase 6 — HUD + feedback (Pixi health bars, damage sprite stages, muzzle/impact/splash/explosion effects, camera shake, React HUD via MatchStore, pause overlay, sr-only live status; verified in browser)
 - [ ] Fase 7 — controles de toque
 - [ ] Fase 8 — telas
 - [ ] Fase 9 — resize/DPR + UX de carregamento de assets

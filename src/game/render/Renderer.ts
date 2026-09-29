@@ -1,6 +1,63 @@
 import { Container, Sprite, TilingSprite, type Application, type Texture } from 'pixi.js';
-import { SHIP_ART_FORWARD, type GameTextures } from '../assets';
+import { SHIP_ART_FORWARD, type GameTextures, type ShipColor } from '../assets';
 import type { Simulation } from '../sim/Simulation';
+import { PLAYER_ID, type SimEvent } from '../sim/types';
+import { Effects } from './Effects';
+import { HealthBar } from './HealthBar';
+
+/** How long a ship stays tinted after being hit (seconds). */
+const HIT_FLASH = 0.16;
+/** Camera shake when the player is hit: duration (s) and max offset (world units). */
+const SHAKE_TIME = 0.22;
+const SHAKE_SIZE = 5;
+/** Health bars float this far above the ship's centre, beyond its radius. */
+const BAR_GAP = 20;
+
+/** Sprite + health bar for one ship. Sprite art swaps as health drops; a red tint flashes on hits. */
+class ShipView {
+  readonly sprite: Sprite;
+  readonly bar: HealthBar;
+  private stage = -1;
+  private flash = 0;
+
+  constructor(
+    private readonly art: Texture[],
+    private readonly thresholds: readonly [number, number, number],
+    healthArt: GameTextures['healthBar'],
+  ) {
+    this.sprite = new Sprite(art[0]);
+    this.sprite.anchor.set(0.5);
+    this.bar = new HealthBar(healthArt);
+  }
+
+  hit(): void {
+    this.flash = HIT_FLASH;
+  }
+
+  update(x: number, y: number, angle: number, radius: number, healthFraction: number, dt: number): void {
+    this.sprite.position.set(x, y);
+    this.sprite.rotation = angle - SHIP_ART_FORWARD;
+
+    const [a, b, c] = this.thresholds;
+    const stage = healthFraction > a ? 0 : healthFraction > b ? 1 : healthFraction > c ? 2 : 3;
+    if (stage !== this.stage) {
+      this.stage = stage;
+      const tex = this.art[stage];
+      if (tex) this.sprite.texture = tex;
+    }
+
+    this.flash = Math.max(0, this.flash - dt);
+    this.sprite.tint = this.flash > 0 ? 0xff7070 : 0xffffff;
+
+    this.bar.view.position.set(x, y - radius - BAR_GAP);
+    this.bar.set(healthFraction);
+  }
+
+  destroy(): void {
+    this.sprite.destroy();
+    this.bar.destroy();
+  }
+}
 
 /**
  * Mirrors simulation state into a Pixi scene. It only reads from the simulation and never mutates it.
@@ -8,19 +65,26 @@ import type { Simulation } from '../sim/Simulation';
  */
 export class Renderer {
   private readonly world = new Container();
-  private readonly playerSprite: Sprite;
+  private readonly shipLayer = new Container();
+  private readonly ballLayer = new Container();
+  private readonly barLayer = new Container();
+  private readonly effects: Effects;
   private readonly textures: GameTextures;
-  private readonly ballTexture: Texture;
-  /** One sprite per live enemy id; removed and destroyed when the enemy leaves the simulation. */
-  private readonly enemySprites = new Map<number, Sprite>();
-  /** Sprite pool: grown on demand, hidden when unused, destroyed with the world. */
+  private readonly player: ShipView;
+  /** One view per live enemy id; removed and destroyed when the enemy leaves the simulation. */
+  private readonly enemyViews = new Map<number, ShipView>();
+  /** Sprite pool for cannonballs: grown on demand, hidden when unused, destroyed with the world. */
   private readonly ballPool: Sprite[] = [];
+  private shake = 0;
+  private baseX = 0;
+  private baseY = 0;
 
   constructor(
     private readonly app: Application,
     private readonly sim: Simulation,
     textures: GameTextures,
   ) {
+    this.textures = textures;
     const { width, height } = sim.config.arena;
 
     const water = new TilingSprite({ texture: textures.water, width, height });
@@ -29,23 +93,29 @@ export class Renderer {
     for (const island of sim.islands) {
       const s = new Sprite(textures.islands[island.art]);
       s.anchor.set(0.5);
-      // Art is a little larger than the collision circle so the beach edge is walkable-looking, not clipped.
+      // Art is a little larger than the collision circle so the beach edge is not clipped.
       s.width = island.radius * 2.3;
       s.height = island.radius * 2.3;
       s.position.set(island.x, island.y);
       this.world.addChild(s);
     }
 
-    this.playerSprite = new Sprite(textures.ships.blue[0]);
-    this.playerSprite.anchor.set(0.5);
-    this.world.addChild(this.playerSprite);
+    this.world.addChild(this.shipLayer, this.ballLayer);
+    this.effects = new Effects(this.world, textures);
+    this.world.addChild(this.barLayer);
 
-    this.textures = textures;
-    this.ballTexture = textures.cannonBall;
+    this.player = this.makeShip('blue');
     app.stage.addChild(this.world);
     app.renderer.on('resize', this.layout);
     this.layout();
-    this.update();
+    this.update(0);
+  }
+
+  private makeShip(color: ShipColor): ShipView {
+    const view = new ShipView(this.textures.ships[color], this.sim.config.feedback.damageStageThresholds, this.textures.healthBar);
+    this.shipLayer.addChild(view.sprite);
+    this.barLayer.addChild(view.bar.view);
+    return view;
   }
 
   /** Fits the arena into the canvas, preserving aspect ratio. */
@@ -53,37 +123,66 @@ export class Renderer {
     const { width, height } = this.sim.config.arena;
     const scale = Math.min(this.app.screen.width / width, this.app.screen.height / height);
     this.world.scale.set(scale);
-    this.world.position.set((this.app.screen.width - width * scale) / 2, (this.app.screen.height - height * scale) / 2);
+    this.baseX = (this.app.screen.width - width * scale) / 2;
+    this.baseY = (this.app.screen.height - height * scale) / 2;
+    this.world.position.set(this.baseX, this.baseY);
   };
 
-  update(): void {
-    const p = this.sim.player;
-    this.playerSprite.position.set(p.x, p.y);
-    this.playerSprite.rotation = p.angle - SHIP_ART_FORWARD;
-    this.syncEnemies();
-    this.syncProjectiles();
+  /** Turns simulation events into effects. Call once per frame with the drained events. */
+  handleEvents(events: SimEvent[]): void {
+    for (const ev of events) {
+      switch (ev.type) {
+        case 'shot':
+          this.effects.muzzleFlash(ev.x, ev.y);
+          break;
+        case 'splash':
+          this.effects.splash(ev.x, ev.y);
+          break;
+        case 'hit':
+          this.effects.impact(ev.x, ev.y);
+          if (ev.target === 'player') {
+            this.player.hit();
+            this.shake = SHAKE_TIME;
+          } else {
+            this.enemyViews.get(ev.targetId)?.hit();
+          }
+          break;
+        case 'destroyed':
+          this.effects.explosion(ev.x, ev.y);
+          if (ev.targetId === PLAYER_ID) this.shake = SHAKE_TIME * 2;
+          break;
+      }
+    }
   }
 
-  private syncEnemies(): void {
+  /** `dt` is wall-clock seconds since the last frame; used only for cosmetic timers. */
+  update(dt: number): void {
+    const { player: p } = this.sim;
+    this.player.update(p.x, p.y, p.angle, p.radius, p.health / p.maxHealth, dt);
+    this.syncEnemies(dt);
+    this.syncProjectiles();
+    this.effects.update(dt);
+
+    this.shake = Math.max(0, this.shake - dt);
+    const amp = this.shake > 0 ? (this.shake / SHAKE_TIME) * SHAKE_SIZE : 0;
+    this.world.position.set(this.baseX + (Math.random() - 0.5) * 2 * amp, this.baseY + (Math.random() - 0.5) * 2 * amp);
+  }
+
+  private syncEnemies(dt: number): void {
     const live = new Set<number>();
     for (const e of this.sim.enemies) {
       live.add(e.id);
-      let sprite = this.enemySprites.get(e.id);
-      if (!sprite) {
-        const color = e.kind === 'chaser' ? 'black' : 'red';
-        sprite = new Sprite(this.textures.ships[color][0]);
-        sprite.anchor.set(0.5);
-        this.enemySprites.set(e.id, sprite);
-        // Ships sit under projectiles.
-        this.world.addChildAt(sprite, this.world.getChildIndex(this.playerSprite));
+      let view = this.enemyViews.get(e.id);
+      if (!view) {
+        view = this.makeShip(e.kind === 'chaser' ? 'black' : 'red');
+        this.enemyViews.set(e.id, view);
       }
-      sprite.position.set(e.x, e.y);
-      sprite.rotation = e.angle - SHIP_ART_FORWARD;
+      view.update(e.x, e.y, e.angle, e.radius, e.health / e.maxHealth, dt);
     }
-    for (const [id, sprite] of this.enemySprites) {
+    for (const [id, view] of this.enemyViews) {
       if (live.has(id)) continue;
-      sprite.destroy();
-      this.enemySprites.delete(id);
+      view.destroy();
+      this.enemyViews.delete(id);
     }
   }
 
@@ -92,9 +191,9 @@ export class Renderer {
     for (let i = 0; i < balls.length; i++) {
       let sprite = this.ballPool[i];
       if (!sprite) {
-        sprite = new Sprite(this.ballTexture);
+        sprite = new Sprite(this.textures.cannonBall);
         sprite.anchor.set(0.5);
-        this.world.addChild(sprite);
+        this.ballLayer.addChild(sprite);
         this.ballPool.push(sprite);
       }
       const b = balls[i];
@@ -113,7 +212,7 @@ export class Renderer {
     this.app.stage.removeChild(this.world);
     // Textures are shared/cached by the asset loader, so only the display objects are destroyed here.
     this.world.destroy({ children: true });
-    this.enemySprites.clear();
+    this.enemyViews.clear();
     this.ballPool.length = 0;
   }
 }

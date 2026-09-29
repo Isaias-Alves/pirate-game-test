@@ -22,7 +22,11 @@ function HoldButton({ game, action, icon, label, className }: HoldButtonProps) {
   const press = (e: PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!game.setControl(action, true)) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Synthetic or already-released pointer: the press still counts, release comes from pointerup/cancel.
+    }
     setPressed(true);
   };
   const release = () => {

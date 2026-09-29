@@ -1,53 +1,50 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import type { Game } from '../game/Game';
-import { uiUrl } from './uiAssets';
+import { Dialog } from './Dialog';
 import { useMatch } from './useMatch';
 
+interface PauseOverlayProps {
+  game: Game;
+  onRestart: () => void;
+  onExit: () => void;
+}
+
 /**
- * Modal shown while paused. Focus moves to Resume on open and is kept inside the dialog; resuming
- * always needs an explicit action (button, Enter/Space on it, or the pause key).
+ * Modal shown while paused. Resuming always needs an explicit action (button, or the pause key) so
+ * nothing from the paused period is carried over.
  */
-export function PauseOverlay({ game }: { game: Game }) {
+export function PauseOverlay({ game, onRestart, onExit }: PauseOverlayProps) {
   const m = useMatch(game);
-  const resumeRef = useRef<HTMLButtonElement>(null);
-  const open = m.phase === 'paused';
+  if (m.phase !== 'paused') return null;
+  return <PauseDialog game={game} focusCause={m.pauseCause} onRestart={onRestart} onExit={onExit} />;
+}
 
-  useEffect(() => {
-    if (open) resumeRef.current?.focus();
-  }, [open]);
-
-  if (!open) return null;
+function PauseDialog({ game, focusCause, onRestart, onExit }: PauseOverlayProps & { focusCause: 'manual' | 'focus' | null }) {
+  const resume = useRef<HTMLButtonElement>(null);
   return (
-    <div className="overlay" role="presentation">
-      <div
-        className="overlay__panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="pause-title"
-        style={{ backgroundImage: `url(${uiUrl('panel_menu')})` }}
-        onKeyDown={(e) => {
-          // Single focusable control: keep Tab inside the dialog.
-          if (e.key === 'Tab') {
-            e.preventDefault();
-            resumeRef.current?.focus();
-          }
-        }}
-      >
-        <h2 id="pause-title">Paused</h2>
-        <p>{m.pauseCause === 'focus' ? 'The game paused because the window lost focus.' : 'Take a breather, captain.'}</p>
+    <Dialog labelledBy="pause-title" initialFocus={resume} className="pause">
+      <h2 id="pause-title">Paused</h2>
+      <p>{focusCause === 'focus' ? 'The game paused because the window lost focus.' : 'Take a breather, captain.'}</p>
+      <div className="pause__actions">
         <button
-          ref={resumeRef}
+          ref={resume}
           type="button"
-          className="btn-primary"
-          style={{ backgroundImage: `url(${uiUrl('button_primary_normal')})` }}
+          className="btn"
           onClick={() => {
             game.resume();
           }}
+          data-testid="resume"
         >
           Resume
         </button>
-        <p className="overlay__hint">Esc or P also resumes.</p>
+        <button type="button" className="btn btn--secondary btn--small" onClick={onRestart} data-testid="restart">
+          Restart
+        </button>
+        <button type="button" className="btn btn--secondary btn--small" onClick={onExit} data-testid="quit">
+          Main Menu
+        </button>
       </div>
-    </div>
+      <p className="overlay__hint">Esc or P also resumes. Leaving abandons this match — it will not be recorded.</p>
+    </Dialog>
   );
 }

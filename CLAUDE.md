@@ -95,7 +95,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 - [x] Fase 5 — ciclo da partida (score, timer, end by time/death, freeze after end, pause manual+auto with explicit resume, restart, MatchStore; 38 unit tests + browser check)
 - [x] Fase 6 — HUD + feedback (Pixi health bars, damage sprite stages, muzzle/impact/splash/explosion effects, camera shake, React HUD via MatchStore, pause overlay, sr-only live status; verified in browser)
 - [x] Fase 7 — controles de toque (pointer-capture hold buttons: turn L/R, forward, 3 cannons; simultaneous multi-touch; shown on coarse pointer or ?touch=1; verified in browser at 812x375)
-- [ ] Fase 8 — telas
+- [x] Fase 8 — telas (menu w/ Ranking+History tabs [placeholders until phase 10], options w/ validation+persistence, match screen w/ pause/restart/quit dialog, result dialog, last-match card; verified in browser)
 - [ ] Fase 9 — resize/DPR + UX de carregamento de assets
 - [ ] Fase 10 — camada de dados de ranking/histórico
 - [ ] Fase 11 — controles de cenário do MSW

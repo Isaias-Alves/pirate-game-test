@@ -1,26 +1,32 @@
 import { Application } from 'pixi.js';
-import { useEffect, useRef, useState } from 'react';
-import { Hud } from '../ui/Hud';
-import { LiveStatus } from '../ui/LiveStatus';
-import { PauseOverlay } from '../ui/PauseOverlay';
-import { TouchControls } from '../ui/TouchControls';
-import { wantsTouchControls } from '../ui/touchSupport';
-import '../ui/hud.css';
-import { loadGameAssets } from './assets';
-import { Game } from './Game';
-import { gameConfig } from './gameConfig';
-import { exposeGame } from './testHooks';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { loadGameAssets } from '../../game/assets';
+import { Game } from '../../game/Game';
+import type { MatchResult } from '../../game/matchStore';
+import { exposeGame } from '../../game/testHooks';
+import { loadOptions, matchConfig } from '../../storage/options';
+import { saveLastResult } from '../../storage/results';
+import { Hud } from '../Hud';
+import { LiveStatus } from '../LiveStatus';
+import { PauseOverlay } from '../PauseOverlay';
+import { TouchControls } from '../TouchControls';
+import { wantsTouchControls } from '../touchSupport';
+import { ResultPanel } from './ResultPanel';
+import '../hud.css';
+import '../touch.css';
 
 type Status = 'loading' | 'ready' | 'error';
 
 /**
- * Owns a PixiJS Application and a Game for its lifetime. Pixi init and asset loading are async, so
- * the effect tracks `cancelled` to stay safe under React Strict Mode's mount → unmount → mount cycle.
+ * Owns a PixiJS Application and a Game for the lifetime of one visit to the combat screen. Pixi init and
+ * asset loading are async, so the effect tracks cancellation to stay safe under React Strict Mode's
+ * mount → unmount → mount cycle. Leaving the screen disposes everything; an unfinished match is abandoned.
  */
-export function GameCanvas() {
+export function MatchScreen({ onExit }: { onExit: () => void }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>('loading');
   const [game, setGame] = useState<Game | null>(null);
+  const [result, setResult] = useState<MatchResult | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [touch] = useState(wantsTouchControls);
 
@@ -73,7 +79,11 @@ export function GameCanvas() {
           return;
         }
 
-        current = new Game(app, textures, gameConfig);
+        current = new Game(app, textures, matchConfig(loadOptions()));
+        current.onMatchEnd((r) => {
+          saveLastResult(r);
+          setResult(r);
+        });
         exposeGame(current);
         setGame(current);
         setStatus('ready');
@@ -91,27 +101,43 @@ export function GameCanvas() {
       life.cancelled = true;
       observer.disconnect();
       setGame(null);
+      setResult(null);
       // If init/loading is still in flight the async block tears down when it resumes.
       if (initialised) teardown();
     };
   }, [attempt]);
 
+  /** New match with a fresh snapshot of the latest saved options. */
+  const restart = useCallback(() => {
+    setResult(null);
+    game?.restart(matchConfig(loadOptions()));
+  }, [game]);
+
   return (
-    <div className="match">
+    <main className="match" data-testid="screen-match">
+      <h1 className="sr-only">Battle</h1>
       {game ? <Hud game={game} /> : <div />}
       <div className="match__arena">
         <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
-        {status === 'loading' && <p style={overlay}>Loading…</p>}
+        {status === 'loading' && (
+          <p className="match__loading" role="status">
+            Loading…
+          </p>
+        )}
         {status === 'error' && (
-          <div style={overlay} role="alert">
+          <div className="match__loading" role="alert">
             <p>Could not load game assets.</p>
             <button
               type="button"
+              className="btn btn--small"
               onClick={() => {
                 setAttempt((n) => n + 1);
               }}
             >
               Retry
+            </button>
+            <button type="button" className="btn btn--secondary btn--small" onClick={onExit}>
+              Main Menu
             </button>
           </div>
         )}
@@ -121,18 +147,10 @@ export function GameCanvas() {
             <TouchControls game={game} />
           </>
         )}
-        {game && <PauseOverlay game={game} />}
+        {game && !result && <PauseOverlay game={game} onRestart={restart} onExit={onExit} />}
+        {game && result && <ResultPanel result={result} onPlayAgain={restart} onExit={onExit} />}
       </div>
       {game && <LiveStatus game={game} />}
-    </div>
+    </main>
   );
 }
-
-const overlay = {
-  position: 'absolute',
-  inset: 0,
-  display: 'grid',
-  placeItems: 'center',
-  color: '#e8f4f8',
-  font: '16px sans-serif',
-} as const;

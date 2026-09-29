@@ -6,6 +6,7 @@ import { KeyboardInput } from './input/KeyboardInput';
 import { MatchStore, type MatchPhase, type MatchResult, type MatchSnapshot } from './matchStore';
 import { Renderer } from './render/Renderer';
 import { Simulation } from './sim/Simulation';
+import { newId } from '../storage/ids';
 
 /**
  * Glue between the Pixi ticker, the simulation, input and rendering. Owns every listener and
@@ -153,6 +154,7 @@ export class Game {
     const { sim } = this;
     if (!sim.endReason) return;
     const result: MatchResult = {
+      matchId: newId(),
       score: sim.score,
       playedSeconds: sim.time,
       endReason: sim.endReason,

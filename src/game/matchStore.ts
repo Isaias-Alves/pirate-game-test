@@ -16,6 +16,8 @@ export interface MatchSnapshot {
 }
 
 export interface MatchResult {
+  /** Unique per completed match; the idempotency key when the result is submitted. */
+  matchId: string;
   score: number;
   /** Active play time in seconds. */
   playedSeconds: number;

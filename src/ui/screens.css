@@ -1,0 +1,351 @@
+/* Menu, options, tabs, dialogs and match loading states. Tokens live in theme.css. */
+
+/* ---------- Main menu ---------- */
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(12px, 3vh, 28px) 16px 32px;
+}
+
+.menu__header {
+  flex: none;
+}
+
+.menu__title {
+  margin: 0;
+  line-height: 0;
+}
+
+.menu__title img {
+  display: block;
+  width: min(86vw, 420px);
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.5));
+}
+
+.menu__title:focus-visible {
+  outline-offset: 6px;
+}
+
+.menu__grid {
+  width: min(100%, 1040px);
+  display: grid;
+  gap: 8px 20px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.menu__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (min-width: 900px) {
+  .menu__grid {
+    grid-template-columns: minmax(300px, 4fr) minmax(0, 6fr);
+    grid-template-areas:
+      'main board'
+      'controls board';
+  }
+  .menu__main {
+    grid-area: main;
+  }
+  .menu__board {
+    grid-area: board;
+    min-height: 100%;
+  }
+  .menu__controls {
+    grid-area: controls;
+  }
+}
+
+.last-match {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 2px dashed rgb(253 241 211 / 0.25);
+  text-align: center;
+}
+
+.last-match h2,
+.controls h2 {
+  font-size: 22px;
+}
+
+.last-match__score {
+  margin: 0;
+  font: 400 clamp(30px, 6vw, 40px) / 1.1 var(--font-display);
+  color: var(--gold);
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+.last-match__score span {
+  font-size: 1.25em;
+}
+
+.last-match__meta {
+  margin: 4px 0 0;
+  color: var(--cream-dim);
+  font-size: 14px;
+}
+
+/* ---------- Controls legend ---------- */
+.controls__list {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.controls__list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.controls__list dt {
+  color: var(--cream-dim);
+}
+
+.controls__list dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.controls__note {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: var(--cream-dim);
+}
+
+/* ---------- Tabs ---------- */
+.tabs__list {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid rgb(253 241 211 / 0.18);
+}
+
+.tabs__tab {
+  appearance: none;
+  border: 0;
+  border-radius: 10px 10px 0 0;
+  padding: 8px 16px 6px;
+  background: transparent;
+  color: var(--cream-dim);
+  font: 400 20px / 1.1 var(--font-display);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border-bottom: 4px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tabs__tab:hover {
+  color: var(--cream);
+}
+
+.tabs__tab[aria-selected='true'] {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+.tabs__panel {
+  min-height: 240px;
+}
+
+.board__empty {
+  margin: 24px 0;
+  text-align: center;
+  color: var(--cream-dim);
+}
+
+/* ---------- Options ---------- */
+.options {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.options__panel {
+  width: min(100%, 560px);
+}
+
+.options__title {
+  margin: 0 0 16px;
+  font: 400 clamp(30px, 6vw, 40px) / 1.1 var(--font-display);
+  text-shadow: 0 3px 0 var(--ink);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font: 400 20px / 1.2 var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 3px solid var(--wood-500);
+  border-radius: 12px;
+  background: var(--navy-950);
+  color: var(--cream);
+  font: 600 20px / 1.2 var(--font-body);
+}
+
+.field input:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.field__hint {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--cream-dim);
+}
+
+.field__error {
+  margin: 4px 0 0;
+  min-height: 1.4em;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--danger);
+}
+
+.options__status {
+  min-height: 1.5em;
+  margin: 0 0 8px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ok);
+}
+
+.options__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ---------- Match layout, loading ---------- */
+.match__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--cream);
+  font: 400 26px / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+/* ---------- Dialogs (pause, result) ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  background: rgb(4 14 22 / 0.6);
+  z-index: 10;
+  overflow-y: auto;
+}
+
+.overlay__panel {
+  width: min(100%, 420px);
+  text-align: center;
+}
+
+.overlay__panel h2 {
+  font-size: clamp(30px, 6vw, 40px);
+}
+
+.overlay__panel p {
+  margin: 0 0 14px;
+}
+
+.overlay__hint {
+  margin: 12px 0 0 !important;
+  font-size: 13px;
+  color: var(--cream-dim);
+}
+
+.pause__actions,
+.result__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.result__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 0 8px !important;
+  font: 400 clamp(64px, 14vw, 92px) / 1 var(--font-display);
+  color: var(--gold);
+  text-shadow:
+    0 4px 0 var(--ink),
+    0 0 24px rgb(255 211 90 / 0.35);
+}
+
+.result__score-label {
+  font-size: 22px;
+  color: var(--cream);
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+.result__stats {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+}
+
+.result__stats > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgb(4 18 27 / 0.45);
+}
+
+.result__stats dt {
+  color: var(--cream-dim);
+}
+
+.result__stats dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+@media (max-height: 520px) {
+  .overlay__panel {
+    border-width: 28px 24px;
+    border-image-width: 28px 24px;
+  }
+  .result__score {
+    font-size: 56px;
+  }
+  .btn {
+    height: 72px;
+  }
+}

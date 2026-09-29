@@ -79,6 +79,7 @@ npm run build        # build de produção
 npm run preview      # preview do build de produção
 npm run lint         # eslint
 npm run typecheck    # tsc --noEmit
+npm test             # vitest (pure simulation unit tests)
 npm run test:e2e     # playwright (not wired yet, phase 13)
 npm run test:e2e:ui  # (not wired yet, phase 13)
 ```
@@ -88,7 +89,7 @@ npm run test:e2e:ui  # (not wired yet, phase 13)
 _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde parou._
 
 - [x] Fase 1 — scaffold (Vite 8 + React 19 + TS 6 strict + Pixi 8; `gameConfig` in `src/game/gameConfig.ts`; `GameCanvas` is Strict Mode safe; typecheck + lint + build pass)
-- [ ] Fase 2 — loop de simulação
+- [x] Fase 2 — loop de simulação (fixed-step `Simulation`, `Game` glue, `Renderer`, keyboard; vitest unit tests; verified in browser)
 - [ ] Fase 3 — combate
 - [ ] Fase 4 — inimigos + spawner
 - [ ] Fase 5 — ciclo da partida

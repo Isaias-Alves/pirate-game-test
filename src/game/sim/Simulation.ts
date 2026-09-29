@@ -20,6 +20,9 @@ export interface PlayerShip {
   cooldowns: { front: number; left: number; right: number };
 }
 
+export type MatchStatus = 'playing' | 'ended';
+export type EndReason = 'time' | 'death';
+
 export interface Island {
   x: number;
   y: number;
@@ -38,8 +41,14 @@ export class Simulation {
   readonly player: PlayerShip;
   readonly enemies: Enemy[] = [];
   readonly projectiles: Projectile[] = [];
-  /** Active (unpaused) simulated seconds since the match started. */
+  /** Active (unpaused) simulated seconds since the match started. Never exceeds `duration`. */
   time = 0;
+  /** Match length in seconds, fixed from the config snapshot given at construction. */
+  readonly duration: number;
+  /** One point per enemy destroyed by the player's fire (Chaser self-destructs do not count). */
+  score = 0;
+  status: MatchStatus = 'playing';
+  endReason: EndReason | null = null;
   /** Seconds accumulated toward the next spawn. */
   spawnTimer = 0;
   /** Enemies spawned so far (drives the opening sequence). */
@@ -50,6 +59,7 @@ export class Simulation {
   constructor(config: GameConfig, seed = 1) {
     this.config = config;
     this.rng = createRng(seed);
+    this.duration = config.session.duration;
     this.islands = config.arena.islands.map((i) => ({ ...i }));
     const start = config.arena.playerStart;
     this.player = {
@@ -65,8 +75,10 @@ export class Simulation {
     };
   }
 
+  /** Advances the match. Once ended, nothing moves, shoots, spawns, takes damage or scores. */
   step(dt: number, input: InputState): void {
-    this.time += dt;
+    if (this.status === 'ended') return;
+    this.time = Math.min(this.time + dt, this.duration);
     if (this.player.alive) {
       this.stepPlayer(dt, input);
       this.stepWeapons(dt, input);
@@ -75,6 +87,17 @@ export class Simulation {
     stepEnemies(this, dt);
     this.stepProjectiles(dt);
     this.sweepEnemies();
+    this.checkEnd();
+  }
+
+  private checkEnd(): void {
+    if (!this.player.alive) this.end('death');
+    else if (this.time >= this.duration) this.end('time');
+  }
+
+  private end(reason: EndReason): void {
+    this.status = 'ended';
+    this.endReason = reason;
   }
 
   pushEvent(e: SimEvent): void {
@@ -206,6 +229,7 @@ export class Simulation {
       if (!e.alive || !segmentHitsCircle(px, py, b.x, b.y, e, b.radius)) continue;
       b.alive = false;
       this.damageEnemy(e, b.damage, b.x, b.y);
+      if (e.health <= 0) this.score += 1;
       return;
     }
   }

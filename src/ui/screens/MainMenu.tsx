@@ -6,6 +6,7 @@ import { Tabs } from '../Tabs';
 import { useFocusOnMount } from '../useFocusOnMount';
 import { uiUrl } from '../uiAssets';
 import { ControlsLegend } from './ControlsLegend';
+import { MockControls } from './MockControls';
 
 interface MainMenuProps {
   onPlay: () => void;
@@ -80,6 +81,10 @@ export function MainMenu({ onPlay, onOptions }: MainMenuProps) {
 
         <section className="panel menu__controls">
           <ControlsLegend />
+        </section>
+
+        <section className="panel menu__sim" aria-label="Mock API controls">
+          <MockControls />
         </section>
       </div>
     </main>

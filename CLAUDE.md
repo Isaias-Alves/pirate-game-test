@@ -98,7 +98,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 - [x] Fase 8 — telas (menu w/ Ranking+History tabs [placeholders until phase 10], options w/ validation+persistence, match screen w/ pause/restart/quit dialog, result dialog, last-match card; verified in browser)
 - [x] Fase 9 — resize/DPR + UX de carregamento de assets (ResizeObserver+letterbox, DPR capped at 2 + live DPR watch, retina tiles/HUD art at DPR>=1.5, hand-rolled texture loader w/ progress bar, error+retry verified)
 - [x] Fase 10 — camada de dados de ranking/histórico (typed contracts, Axios client, MSW handlers+MockDb+fixtures shared, TanStack hooks w/ revision-guard, idempotent submit + persisted pending queue + retry; 76 tests; verified in browser incl. timeout-after-commit and reload recovery)
-- [ ] Fase 11 — controles de cenário do MSW
+- [x] Fase 11 — controles de cenário do MSW (visible select of 15 scenarios + instant-latency toggle + confirmed reset; verified in dev and in the production build via vite preview)
 - [ ] Fase 12 — limpeza/passagem com Strict Mode
 - [ ] Fase 13 — suíte Playwright
 - [ ] Fase 14 — docs + profiling

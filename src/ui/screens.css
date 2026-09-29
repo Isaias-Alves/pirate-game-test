@@ -256,6 +256,39 @@
   text-shadow: 0 2px 0 var(--ink);
 }
 
+.match__loading p {
+  margin: 0;
+}
+
+.match__loading-pct {
+  font-size: 18px;
+  color: var(--cream-dim);
+}
+
+.loadbar {
+  appearance: none;
+  width: min(72vw, 320px);
+  height: 18px;
+  border: 3px solid var(--wood-500);
+  border-radius: 999px;
+  background: var(--navy-950);
+  overflow: hidden;
+}
+
+.loadbar::-webkit-progress-bar {
+  background: var(--navy-950);
+}
+
+.loadbar::-webkit-progress-value {
+  background: linear-gradient(var(--gold), var(--gold-deep));
+  border-radius: 999px;
+  transition: width 0.15s ease-out;
+}
+
+.loadbar::-moz-progress-bar {
+  background: linear-gradient(var(--gold), var(--gold-deep));
+}
+
 /* ---------- Dialogs (pause, result) ---------- */
 .overlay {
   position: absolute;

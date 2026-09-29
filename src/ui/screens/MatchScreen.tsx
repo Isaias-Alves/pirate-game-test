@@ -2,6 +2,7 @@ import { Application } from 'pixi.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { loadGameAssets } from '../../game/assets';
 import { Game } from '../../game/Game';
+import { currentResolution, watchPixelRatio } from '../../game/pixelRatio';
 import type { MatchResult } from '../../game/matchStore';
 import { exposeGame } from '../../game/testHooks';
 import { loadOptions, matchConfig } from '../../storage/options';
@@ -27,6 +28,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
   const [status, setStatus] = useState<Status>('loading');
   const [game, setGame] = useState<Game | null>(null);
   const [result, setResult] = useState<MatchResult | null>(null);
+  const [progress, setProgress] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const [touch] = useState(wantsTouchControls);
 
@@ -44,11 +46,13 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
       if (initialised && !life.destroyed) app.renderer.resize(host.clientWidth, host.clientHeight);
     });
     observer.observe(host);
+    let stopWatchingRatio: (() => void) | undefined;
 
     const teardown = () => {
       if (life.destroyed) return;
       life.destroyed = true;
       observer.disconnect();
+      stopWatchingRatio?.();
       current?.dispose();
       current = undefined;
       exposeGame(undefined);
@@ -58,12 +62,13 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
     void (async () => {
       try {
         setStatus('loading');
+        setProgress(0);
         await app.init({
           width: host.clientWidth,
           height: host.clientHeight,
           background: '#0b2a3d',
           antialias: true,
-          resolution: window.devicePixelRatio,
+          resolution: currentResolution(),
           autoDensity: true,
         });
         initialised = true;
@@ -72,8 +77,14 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
           return;
         }
         host.appendChild(app.canvas);
+        // Follow browser zoom / monitor changes: re-render at the new density, keep the same logical size.
+        stopWatchingRatio = watchPixelRatio(() => {
+          if (life.destroyed) return;
+          app.renderer.resolution = currentResolution();
+          app.renderer.resize(host.clientWidth, host.clientHeight);
+        });
 
-        const textures = await loadGameAssets();
+        const textures = await loadGameAssets(setProgress, currentResolution());
         if (isCancelled()) {
           teardown();
           return;
@@ -100,6 +111,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
     return () => {
       life.cancelled = true;
       observer.disconnect();
+      stopWatchingRatio?.();
       setGame(null);
       setResult(null);
       // If init/loading is still in flight the async block tears down when it resumes.
@@ -120,16 +132,19 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
       <div className="match__arena">
         <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
         {status === 'loading' && (
-          <p className="match__loading" role="status">
-            Loading…
-          </p>
+          <div className="match__loading" role="status" data-testid="loading">
+            <p>Loading the seas…</p>
+            <progress className="loadbar" max={1} value={progress} aria-label="Loading game assets" />
+            <p className="match__loading-pct">{Math.round(progress * 100)}%</p>
+          </div>
         )}
         {status === 'error' && (
-          <div className="match__loading" role="alert">
-            <p>Could not load game assets.</p>
+          <div className="match__loading" role="alert" data-testid="load-error">
+            <p>Could not load game assets. Check your connection and try again.</p>
             <button
               type="button"
               className="btn btn--small"
+              data-testid="retry"
               onClick={() => {
                 setAttempt((n) => n + 1);
               }}

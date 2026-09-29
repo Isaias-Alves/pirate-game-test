@@ -60,6 +60,8 @@ export interface GameTextures {
 export type LoadProgress = (fraction: number) => void;
 
 const cache = new Map<string, Texture>();
+/** Fully assembled texture sets per density, so cropped island textures are created once, not per match. */
+const sets = new Map<1 | 2, GameTextures>();
 const inflight = new Map<string, Promise<Texture>>();
 
 /** Fetches one PNG into a texture. `resolution` 2 marks @2x art so its logical size stays the same. */
@@ -93,6 +95,11 @@ export const pickDensity = (pixelRatio: number): 1 | 2 => (pixelRatio >= 1.5 ? 2
  */
 export async function loadGameAssets(onProgress: LoadProgress = () => undefined, pixelRatio = 1): Promise<GameTextures> {
   const d = pickDensity(pixelRatio);
+  const existing = sets.get(d);
+  if (existing) {
+    onProgress(1);
+    return existing;
+  }
   const shipFiles = Array.from({ length: SHIP_DAMAGE_STAGES * SHIP_COLORS.length }, (_, i) => `ship_${String(i + 1)}.png`);
 
   const jobs: { name: string; src: string; resolution: 1 | 2 }[] = [
@@ -129,7 +136,7 @@ export async function loadGameAssets(onProgress: LoadProgress = () => undefined,
   const sheet = get('tiles_sheet');
   const crop = (x: number, y: number, w: number, h: number) => new Texture({ source: sheet.source, frame: new Rectangle(x, y, w, h) });
 
-  return {
+  const set: GameTextures = {
     ships,
     cannonBall: get('cannon_ball.png'),
     explosion: ['explosion_1.png', 'explosion_2.png', 'explosion_3.png'].map(get),
@@ -145,4 +152,6 @@ export async function loadGameAssets(onProgress: LoadProgress = () => undefined,
       fillRect: { x: 24, y: 12, w: 112, h: 15 },
     },
   };
+  sets.set(d, set);
+  return set;
 }

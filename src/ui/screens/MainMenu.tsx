@@ -1,3 +1,4 @@
+import { useSubmissions } from '../../api/submissionsContext';
 import { loadLastResult } from '../../storage/results';
 import { HistoryPanel, RankingPanel } from '../board/BoardPanels';
 import { END_REASON_TEXT, formatClock, formatDate } from '../format';
@@ -27,6 +28,22 @@ function LastMatch() {
   );
 }
 
+function PendingBanner() {
+  const { pending, retryAll } = useSubmissions();
+  if (pending.length === 0) return null;
+  const sending = pending.some((p) => p.status === 'sending');
+  return (
+    <div className="pending" role="status" data-testid="pending-banner">
+      <p>
+        {pending.length} finished {pending.length === 1 ? 'match is' : 'matches are'} not recorded yet.
+      </p>
+      <button type="button" className="pager__btn" disabled={sending} onClick={retryAll} data-testid="pending-retry">
+        {sending ? 'Sending…' : 'Send now'}
+      </button>
+    </div>
+  );
+}
+
 export function MainMenu({ onPlay, onOptions }: MainMenuProps) {
   const heading = useFocusOnMount<HTMLHeadingElement>();
   return (
@@ -47,6 +64,7 @@ export function MainMenu({ onPlay, onOptions }: MainMenuProps) {
               Options
             </button>
           </div>
+          <PendingBanner />
           <LastMatch />
         </section>
 

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import type { MatchResult } from '../../game/matchStore';
 import { Dialog } from '../Dialog';
 import { END_REASON_TEXT, formatClock } from '../format';
+import { RecordStatus } from '../RecordStatus';
 
 interface ResultPanelProps {
   result: MatchResult;
@@ -32,6 +33,7 @@ export function ResultPanel({ result, onPlayAgain, onExit }: ResultPanelProps) {
           <dd data-testid="result-reason">{END_REASON_TEXT[result.endReason]}</dd>
         </div>
       </dl>
+      <RecordStatus matchId={result.matchId} />
       <div className="result__actions">
         <button ref={playAgain} type="button" className="btn" onClick={onPlayAgain} data-testid="play-again">
           Play Again

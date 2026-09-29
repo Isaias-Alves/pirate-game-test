@@ -1,6 +1,7 @@
 import { Application } from 'pixi.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { loadGameAssets } from '../../game/assets';
+import { useSubmissions } from '../../api/submissionsContext';
 import { Game } from '../../game/Game';
 import { currentResolution, watchPixelRatio } from '../../game/pixelRatio';
 import type { MatchResult } from '../../game/matchStore';
@@ -31,6 +32,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
   const [progress, setProgress] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const [touch] = useState(wantsTouchControls);
+  const { enqueue } = useSubmissions();
 
   useEffect(() => {
     const host = hostRef.current;
@@ -93,6 +95,8 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
         current = new Game(app, textures, matchConfig(loadOptions()));
         current.onMatchEnd((r) => {
           saveLastResult(r);
+          // Stored durably before any network call, so a failure or reload cannot lose the result.
+          enqueue(r);
           setResult(r);
         });
         exposeGame(current);
@@ -117,7 +121,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
       // If init/loading is still in flight the async block tears down when it resumes.
       if (initialised) teardown();
     };
-  }, [attempt]);
+  }, [attempt, enqueue]);
 
   /** New match with a fresh snapshot of the latest saved options. */
   const restart = useCallback(() => {

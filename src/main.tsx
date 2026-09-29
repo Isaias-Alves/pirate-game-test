@@ -1,14 +1,23 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { startMocks } from './mocks/browser';
 import './ui/theme.css';
 import './ui/screens.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root element');
 
-createRoot(root).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+// The mock API must be listening before the first request, so render only after the worker is ready.
+void startMocks()
+  .catch((err: unknown) => {
+    // Without the worker only ranking/history are affected; the game itself keeps working.
+    console.error('Mock API failed to start', err);
+  })
+  .then(() => {
+    createRoot(root).render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    );
+  });

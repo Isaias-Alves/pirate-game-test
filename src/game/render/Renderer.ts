@@ -1,4 +1,4 @@
-import { Container, Sprite, TilingSprite, type Application } from 'pixi.js';
+import { Container, Sprite, TilingSprite, type Application, type Texture } from 'pixi.js';
 import { SHIP_ART_FORWARD, type GameTextures } from '../assets';
 import type { Simulation } from '../sim/Simulation';
 
@@ -9,6 +9,9 @@ import type { Simulation } from '../sim/Simulation';
 export class Renderer {
   private readonly world = new Container();
   private readonly playerSprite: Sprite;
+  private readonly ballTexture: Texture;
+  /** Sprite pool: grown on demand, hidden when unused, destroyed with the world. */
+  private readonly ballPool: Sprite[] = [];
 
   constructor(
     private readonly app: Application,
@@ -34,6 +37,7 @@ export class Renderer {
     this.playerSprite.anchor.set(0.5);
     this.world.addChild(this.playerSprite);
 
+    this.ballTexture = textures.cannonBall;
     app.stage.addChild(this.world);
     app.renderer.on('resize', this.layout);
     this.layout();
@@ -52,6 +56,28 @@ export class Renderer {
     const p = this.sim.player;
     this.playerSprite.position.set(p.x, p.y);
     this.playerSprite.rotation = p.angle - SHIP_ART_FORWARD;
+    this.syncProjectiles();
+  }
+
+  private syncProjectiles(): void {
+    const balls = this.sim.projectiles;
+    for (let i = 0; i < balls.length; i++) {
+      let sprite = this.ballPool[i];
+      if (!sprite) {
+        sprite = new Sprite(this.ballTexture);
+        sprite.anchor.set(0.5);
+        this.world.addChild(sprite);
+        this.ballPool.push(sprite);
+      }
+      const b = balls[i];
+      if (!b) continue;
+      sprite.visible = true;
+      sprite.position.set(b.x, b.y);
+    }
+    for (let i = balls.length; i < this.ballPool.length; i++) {
+      const sprite = this.ballPool[i];
+      if (sprite) sprite.visible = false;
+    }
   }
 
   destroy(): void {

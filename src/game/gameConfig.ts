@@ -26,6 +26,8 @@ export interface WeaponStats {
   projectileSpeed: number;
   /** Seconds before a projectile expires. */
   projectileLifetime: number;
+  /** Hit radius of each projectile in world units. */
+  projectileRadius: number;
 }
 
 export interface GameConfig {
@@ -81,8 +83,16 @@ export const gameConfig: GameConfig = {
     turnSpeed: 2.2,
     radius: 26,
     speedResponse: 2.5,
-    front: { damage: 20, cooldown: 0.35, projectileSpeed: 520, projectileLifetime: 1.4 },
-    side: { damage: 10, cooldown: 1.1, projectileSpeed: 460, projectileLifetime: 1.1, count: 3, spacing: 22 },
+    front: { damage: 20, cooldown: 0.35, projectileSpeed: 520, projectileLifetime: 1.4, projectileRadius: 5 },
+    side: {
+      damage: 10,
+      cooldown: 1.1,
+      projectileSpeed: 460,
+      projectileLifetime: 1.1,
+      projectileRadius: 5,
+      count: 3,
+      spacing: 22,
+    },
   },
   chaser: { maxHealth: 40, moveSpeed: 130, turnSpeed: 1.8, radius: 24, contactDamage: 25 },
   shooter: {
@@ -91,6 +101,6 @@ export const gameConfig: GameConfig = {
     turnSpeed: 1.5,
     radius: 26,
     attackRange: 320,
-    weapon: { damage: 10, cooldown: 1.6, projectileSpeed: 380, projectileLifetime: 1.6 },
+    weapon: { damage: 10, cooldown: 1.6, projectileSpeed: 380, projectileLifetime: 1.6, projectileRadius: 5 },
   },
 };

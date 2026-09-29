@@ -39,6 +39,8 @@ export class Game {
       this.sim.step(fixedStep, this.input);
       this.accumulator -= fixedStep;
     }
+    // Effects are wired up in phase 6; drain so the queue cannot grow unbounded.
+    this.sim.drainEvents();
     this.renderer.update();
   };
 

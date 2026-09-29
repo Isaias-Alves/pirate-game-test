@@ -1,7 +1,9 @@
 import type { GameConfig, WeaponStats } from '../gameConfig';
 import type { InputState } from '../input/InputState';
 import { clampToArena, pushOutOfCircle, segmentHitsCircle } from './collision';
+import { stepEnemies } from './enemyAI';
 import { createRng, type Rng } from './rng';
+import { stepSpawner } from './spawner';
 import type { Enemy, Owner, Projectile, SimEvent } from './types';
 
 export interface PlayerShip {
@@ -38,6 +40,11 @@ export class Simulation {
   readonly projectiles: Projectile[] = [];
   /** Active (unpaused) simulated seconds since the match started. */
   time = 0;
+  /** Seconds accumulated toward the next spawn. */
+  spawnTimer = 0;
+  /** Enemies spawned so far (drives the opening sequence). */
+  spawnedCount = 0;
+  nextEnemyId = 1;
   private events: SimEvent[] = [];
 
   constructor(config: GameConfig, seed = 1) {
@@ -64,7 +71,21 @@ export class Simulation {
       this.stepPlayer(dt, input);
       this.stepWeapons(dt, input);
     }
+    stepSpawner(this, dt);
+    stepEnemies(this, dt);
     this.stepProjectiles(dt);
+    this.sweepEnemies();
+  }
+
+  pushEvent(e: SimEvent): void {
+    this.events.push(e);
+  }
+
+  /** Destroyed enemies leave the world: they no longer collide, shoot or hurt anyone. */
+  private sweepEnemies(): void {
+    let w = 0;
+    for (const e of this.enemies) if (e.alive) this.enemies[w++] = e;
+    this.enemies.length = w;
   }
 
   /** Returns and clears the effects queued since the last call. */

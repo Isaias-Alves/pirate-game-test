@@ -91,7 +91,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 - [x] Fase 1 — scaffold (Vite 8 + React 19 + TS 6 strict + Pixi 8; `gameConfig` in `src/game/gameConfig.ts`; `GameCanvas` is Strict Mode safe; typecheck + lint + build pass)
 - [x] Fase 2 — loop de simulação (fixed-step `Simulation`, `Game` glue, `Renderer`, keyboard; vitest unit tests; verified in browser)
 - [x] Fase 3 — combate (front + 3-shot broadsides, per-weapon cooldowns, projectile lifecycle, swept hit test; 17 unit tests)
-- [ ] Fase 4 — inimigos + spawner
+- [x] Fase 4 — inimigos + spawner (Chaser, Shooter, island steering, validated spawn points, opening sequence; 29 unit tests)
 - [ ] Fase 5 — ciclo da partida
 - [ ] Fase 6 — HUD + feedback
 - [ ] Fase 7 — controles de toque

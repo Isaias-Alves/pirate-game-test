@@ -9,7 +9,10 @@ import type { Simulation } from '../sim/Simulation';
 export class Renderer {
   private readonly world = new Container();
   private readonly playerSprite: Sprite;
+  private readonly textures: GameTextures;
   private readonly ballTexture: Texture;
+  /** One sprite per live enemy id; removed and destroyed when the enemy leaves the simulation. */
+  private readonly enemySprites = new Map<number, Sprite>();
   /** Sprite pool: grown on demand, hidden when unused, destroyed with the world. */
   private readonly ballPool: Sprite[] = [];
 
@@ -37,6 +40,7 @@ export class Renderer {
     this.playerSprite.anchor.set(0.5);
     this.world.addChild(this.playerSprite);
 
+    this.textures = textures;
     this.ballTexture = textures.cannonBall;
     app.stage.addChild(this.world);
     app.renderer.on('resize', this.layout);
@@ -56,7 +60,31 @@ export class Renderer {
     const p = this.sim.player;
     this.playerSprite.position.set(p.x, p.y);
     this.playerSprite.rotation = p.angle - SHIP_ART_FORWARD;
+    this.syncEnemies();
     this.syncProjectiles();
+  }
+
+  private syncEnemies(): void {
+    const live = new Set<number>();
+    for (const e of this.sim.enemies) {
+      live.add(e.id);
+      let sprite = this.enemySprites.get(e.id);
+      if (!sprite) {
+        const color = e.kind === 'chaser' ? 'black' : 'red';
+        sprite = new Sprite(this.textures.ships[color][0]);
+        sprite.anchor.set(0.5);
+        this.enemySprites.set(e.id, sprite);
+        // Ships sit under projectiles.
+        this.world.addChildAt(sprite, this.world.getChildIndex(this.playerSprite));
+      }
+      sprite.position.set(e.x, e.y);
+      sprite.rotation = e.angle - SHIP_ART_FORWARD;
+    }
+    for (const [id, sprite] of this.enemySprites) {
+      if (live.has(id)) continue;
+      sprite.destroy();
+      this.enemySprites.delete(id);
+    }
   }
 
   private syncProjectiles(): void {
@@ -85,5 +113,7 @@ export class Renderer {
     this.app.stage.removeChild(this.world);
     // Textures are shared/cached by the asset loader, so only the display objects are destroyed here.
     this.world.destroy({ children: true });
+    this.enemySprites.clear();
+    this.ballPool.length = 0;
   }
 }

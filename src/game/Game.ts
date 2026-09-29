@@ -44,6 +44,14 @@ export class Game {
     this.renderer.update();
   };
 
+  /** Steps the simulation by `seconds` of game time (fixed steps) and redraws. Used by tests and tooling. */
+  advance(seconds: number): void {
+    const { fixedStep } = this.config.simulation;
+    for (let t = 0; t < seconds; t += fixedStep) this.sim.step(fixedStep, this.input);
+    this.sim.drainEvents();
+    this.renderer.update();
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;

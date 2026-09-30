@@ -201,12 +201,16 @@ export const sample = (page: Page, seconds: number, step: number): Promise<Snaps
     { seconds, step },
   );
 
-/** Pages forward through a list until the last page. */
+/** Pages forward through a list until the last page, waiting for each page's rows to load. */
 export async function goToLastPage(page: Page): Promise<void> {
-  const next = page.getByTestId('next-page');
-  for (let i = 0; i < 30 && (await next.isEnabled()); i++) {
-    const label = await page.getByTestId('page-label').textContent();
-    await next.click();
-    await expect(page.getByTestId('page-label')).not.toHaveText(label ?? '');
+  const label = page.getByTestId('page-label');
+  const read = async () => {
+    const m = /Page (\d+) of (\d+)/.exec((await label.textContent()) ?? '');
+    return { at: Number(m?.[1] ?? 1), of: Number(m?.[2] ?? 1) };
+  };
+  for (let { at, of } = await read(); at < of; { at, of } = await read()) {
+    await page.getByTestId('next-page').click();
+    await expect(label).toContainText(`Page ${String(at + 1)} of`);
+    await expect(page.locator('.board__list[aria-busy="false"]')).toBeVisible();
   }
 }

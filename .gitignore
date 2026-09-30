@@ -11,6 +11,8 @@ dist/
 .env
 .env.*
 !.env.example
+# Committed on purpose: the Playwright build needs it (test hooks + short timeouts). No secrets.
+!.env.e2e
 
 # Logs
 *.log

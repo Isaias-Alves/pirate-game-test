@@ -33,6 +33,11 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
   const [attempt, setAttempt] = useState(0);
   const [touch] = useState(wantsTouchControls);
   const { enqueue } = useSubmissions();
+  // Read through a ref: the effect below owns the whole Pixi app, so it must depend on nothing but `attempt`.
+  const enqueueRef = useRef(enqueue);
+  useEffect(() => {
+    enqueueRef.current = enqueue;
+  }, [enqueue]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -98,7 +103,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
         current.onMatchEnd((r) => {
           saveLastResult(r);
           // Stored durably before any network call, so a failure or reload cannot lose the result.
-          enqueue(r);
+          enqueueRef.current(r);
           setResult(r);
         });
         exposeGame(current);
@@ -123,7 +128,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
       // If init/loading is still in flight the async block tears down when it resumes.
       if (initialised) teardown();
     };
-  }, [attempt, enqueue]);
+  }, [attempt]);
 
   /** New match with a fresh snapshot of the latest saved options. */
   const restart = useCallback(() => {

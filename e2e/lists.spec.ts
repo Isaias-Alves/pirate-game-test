@@ -104,6 +104,25 @@ test.describe('Ranking and Match History lists', () => {
     await expect(page.getByTestId('board-error')).toBeVisible();
   });
 
+  test('a list that shrinks under the current page jumps back into range', async ({ page }) => {
+    await openMenu(page, { scenario: 'paginated' });
+    await page.getByTestId('tab-history').click();
+    for (let i = 0; i < 3; i++) await page.getByTestId('next-page').click();
+    await expect(page.getByTestId('page-label')).toHaveText('Page 4 of 4');
+    await chooseScenario(page, 'success'); // history is empty again
+    await expect(page.getByTestId('board-empty')).toBeVisible();
+    await chooseScenario(page, 'paginated');
+    await expect(page.getByTestId('page-label')).toHaveText('Page 1 of 4');
+    await expect(page.getByTestId('history-row')).toHaveCount(8);
+
+    await page.getByTestId('tab-ranking').click();
+    for (let i = 0; i < 9; i++) await page.getByTestId('next-page').click();
+    await expect(page.getByTestId('page-label')).toHaveText('Page 10 of 10');
+    await chooseScenario(page, 'success'); // 34 entries: only 5 pages now
+    await expect(page.getByTestId('page-label')).toHaveText('Page 5 of 5');
+    await expect(page.getByTestId('ranking-row').first()).toBeVisible();
+  });
+
   test('switching tabs shows current data again', async ({ page }) => {
     await openMenu(page, { scenario: 'paginated' });
     await expect(rows(page, 'ranking')).toHaveCount(8);

@@ -16,7 +16,8 @@ interface QueryLike<T> {
   refetch: () => unknown;
 }
 
-function Pager({ page, totalPages, onPage, busy }: { page: number; totalPages: number; onPage: (p: number) => void; busy: boolean }) {
+/** `page` is the page the user asked for, so the label and buttons react at once even while that page is still loading. */
+function Pager({ page, totalPages, onPage }: { page: number; totalPages: number; onPage: (p: number) => void }) {
   return (
     <nav className="pager" aria-label="Pagination">
       <button
@@ -32,7 +33,6 @@ function Pager({ page, totalPages, onPage, busy }: { page: number; totalPages: n
       </button>
       <span className="pager__label" aria-live="polite" data-testid="page-label">
         Page {page} of {totalPages}
-        {busy && <span className="sr-only"> (updating)</span>}
       </span>
       <button
         type="button"
@@ -52,12 +52,14 @@ function Pager({ page, totalPages, onPage, busy }: { page: number; totalPages: n
 /** Shared loading / error / empty / data shell for both list tabs. */
 function ListShell<T>({
   query,
+  page,
   onPage,
   emptyText,
   what,
   children,
 }: {
   query: QueryLike<T>;
+  page: number;
   onPage: (p: number) => void;
   emptyText: string;
   what: string;
@@ -113,12 +115,22 @@ function ListShell<T>({
         </p>
       )}
       {children(data.items, data)}
-      <Pager page={data.page} totalPages={data.totalPages} onPage={onPage} busy={query.isFetching} />
+      <Pager page={page} totalPages={data.totalPages} onPage={onPage} />
       <p className="board__hint" data-testid="board-count">
         {data.total} {data.total === 1 ? 'match' : 'matches'} · {query.isFetching ? 'updating…' : 'up to date'}
       </p>
     </div>
   );
+}
+
+/**
+ * When the list shrinks under the current page (mock reset, another scenario, fewer records) jump to its last
+ * page instead of showing "Page 8 of 3" with no rows. Adjusting state during render is React's recommended
+ * way to derive state from new data.
+ */
+function clampPage(page: number, query: { data: Page<unknown> | undefined; isPlaceholderData: boolean }, setPage: (p: number) => void): void {
+  const last = query.data?.totalPages;
+  if (last !== undefined && !query.isPlaceholderData && page > last) setPage(last);
 }
 
 const settingsText = (s: MatchSettings) => `${String(s.sessionSeconds)} s session · enemy every ${String(s.spawnInterval)} s`;
@@ -127,6 +139,7 @@ export function RankingPanel() {
   const settings = useCurrentSettings();
   const [page, setPage] = useState(1);
   const query = useRanking(settings, page);
+  clampPage(page, query, setPage);
   const me = getPlayer().id;
   const captionId = useId();
   return (
@@ -134,7 +147,7 @@ export function RankingPanel() {
       <p className="board__note" id={captionId}>
         Best matches with your current setup: <strong>{settingsText(settings)}</strong>. Change it in Options to compare other setups.
       </p>
-      <ListShell query={query} onPage={setPage} what="the ranking" emptyText="No matches recorded for this setup yet. Be the first!">
+      <ListShell query={query} page={page} onPage={setPage} what="the ranking" emptyText="No matches recorded for this setup yet. Be the first!">
         {(items) => (
           <table className="board__table" aria-describedby={captionId}>
             <caption className="sr-only">Ranking</caption>
@@ -178,10 +191,12 @@ export function HistoryPanel() {
   const player = getPlayer();
   const [page, setPage] = useState(1);
   const query = useHistory(player.id, page);
+  clampPage(page, query, setPage);
   return (
     <div data-testid="history-panel">
       <ListShell
         query={query}
+        page={page}
         onPage={setPage}
         what="your match history"
         emptyText="You have not finished a match yet. Play one and it will show up here."

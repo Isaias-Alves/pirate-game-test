@@ -1,4 +1,5 @@
 import type { Game } from '../game/Game';
+import { gameConfig } from '../game/gameConfig';
 import type { MatchSnapshot } from '../game/matchStore';
 import { uiUrl } from './uiAssets';
 import { useMatch } from './useMatch';
@@ -15,7 +16,7 @@ const formatTime = (seconds: number): string => {
 
 function healthFillName(fraction: number): string {
   if (fraction > 0.5) return 'health_fill_green';
-  if (fraction > 0.25) return 'health_fill_amber';
+  if (fraction > gameConfig.feedback.lowHealthFraction) return 'health_fill_amber';
   return 'health_fill_red';
 }
 

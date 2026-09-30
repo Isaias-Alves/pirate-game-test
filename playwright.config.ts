@@ -33,7 +33,8 @@ export default defineConfig({
     { name: 'chromium-mobile', use: { ...devices['Pixel 7 landscape'] } },
   ],
   webServer: {
-    command: `npm run build:e2e && npm run preview:e2e`,
+    // `npm run test:e2e` builds first; the server only serves dist-e2e, so a reused server never serves a stale build.
+    command: 'npm run preview:e2e',
     url: `http://localhost:${String(PORT)}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

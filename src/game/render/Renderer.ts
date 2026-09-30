@@ -10,6 +10,8 @@ const HIT_FLASH = 0.16;
 /** Camera shake when the player is hit: duration (s) and max offset (world units). */
 const SHAKE_TIME = 0.22;
 const SHAKE_SIZE = 5;
+/** Players who ask the OS for less motion get no camera shake (hits still flash and show impact effects). */
+const reducedMotion = (): boolean => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 /** Health bars float this far above the ship's centre, beyond its radius. */
 const BAR_GAP = 20;
 
@@ -76,6 +78,7 @@ export class Renderer {
   /** Sprite pool for cannonballs: grown on demand, hidden when unused, destroyed with the world. */
   private readonly ballPool: Sprite[] = [];
   private shake = 0;
+  private readonly shakeSize = reducedMotion() ? 0 : SHAKE_SIZE;
   private baseX = 0;
   private baseY = 0;
 
@@ -164,7 +167,7 @@ export class Renderer {
     this.effects.update(dt);
 
     this.shake = Math.max(0, this.shake - dt);
-    const amp = this.shake > 0 ? (this.shake / SHAKE_TIME) * SHAKE_SIZE : 0;
+    const amp = this.shake > 0 ? (this.shake / SHAKE_TIME) * this.shakeSize : 0;
     this.world.position.set(this.baseX + (Math.random() - 0.5) * 2 * amp, this.baseY + (Math.random() - 0.5) * 2 * amp);
   }
 

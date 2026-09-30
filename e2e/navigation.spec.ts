@@ -208,3 +208,21 @@ test.describe('Dialogs on small screens', () => {
     await fits(page, "Time's up!");
   });
 });
+
+test.describe('Portrait phone', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('every HUD and touch control stays on screen and the page does not scroll sideways', async ({ page }) => {
+    await startMatch(page, { touch: true });
+    const vw = page.viewportSize()?.width ?? 0;
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(vw);
+    for (const target of [
+      page.getByRole('button', { name: 'Pause game' }),
+      page.getByTestId('time'),
+      page.getByTestId('score'),
+      ...['turnLeft', 'turnRight', 'forward', 'fireFront', 'fireLeft', 'fireRight'].map((id) => page.getByTestId(`touch-${id}`)),
+    ]) {
+      await expect(target).toBeInViewport({ ratio: 1 });
+    }
+  });
+});

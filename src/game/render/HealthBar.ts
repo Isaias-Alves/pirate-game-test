@@ -1,10 +1,11 @@
 import { Container, Graphics, Sprite } from 'pixi.js';
 import type { GameTextures } from '../assets';
+import { gameConfig } from '../gameConfig';
 
 /** Width of a bar in world units; height follows the art's aspect ratio. */
 const BAR_WIDTH = 78;
-/** Below this fraction the fill turns red. */
-const RED_BELOW = 0.35;
+/** At or below this fraction the fill turns red (same threshold as the HUD and the screen-reader warning). */
+const RED_BELOW = gameConfig.feedback.lowHealthFraction;
 
 /**
  * Health indicator drawn above a ship, using the frame/fill art from the UI atlas. The fill is
@@ -39,7 +40,7 @@ export class HealthBar {
     this.fraction = f;
     const { x, y, w, h } = this.fillRect;
     this.mask.clear().rect(x, y, w * f, h).fill(0xffffff);
-    const low = f < RED_BELOW;
+    const low = f <= RED_BELOW;
     this.green.visible = !low;
     this.red.visible = low;
   }

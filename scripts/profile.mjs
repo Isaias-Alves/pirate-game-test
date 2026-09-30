@@ -1,5 +1,5 @@
 // Performance + memory profiling for the combat scene. Usage:  npm run profile
-//   PROFILE_SECONDS=180 (match length)  PROFILE_HEADED=1 (real GPU window)  PROFILE_URL=http://localhost:4174
+//   PROFILE_SECONDS=180 (match length)  PROFILE_DPR=1 (device pixel ratio)  PROFILE_SPAWN=3 (spawn interval)  PROFILE_HEADED=1 (real GPU window)  PROFILE_URL=http://localhost:4174
 // Requires the e2e build to be served (see package.json "profile" script). Writes docs/profiling/results.json.
 import { chromium } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -9,6 +9,10 @@ const URL = process.env.PROFILE_URL ?? 'http://localhost:4174';
 const SECONDS = Number(process.env.PROFILE_SECONDS ?? 180);
 const HEADED = process.env.PROFILE_HEADED === '1';
 const VIEWPORT = { width: 1280, height: 720 };
+/** Device pixel ratio to emulate (PROFILE_DPR=2 for a retina / phone-class display; the renderer caps at 2). */
+const DPR = Number(process.env.PROFILE_DPR ?? 1);
+/** Seconds between enemy spawns (PROFILE_SPAWN=0.5 is the heaviest setting Options allows). */
+const SPAWN = Number(process.env.PROFILE_SPAWN ?? 3);
 
 const pct = (sorted, p) => sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -17,7 +21,7 @@ const browser = await chromium.launch({
   headless: !HEADED,
   args: ['--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--enable-precise-memory-info', ...(process.env.PROFILE_GPU === '1' ? ['--use-angle=d3d11', '--disable-gpu-sandbox'] : [])],
 });
-const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1, locale: 'en-US' });
+const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: DPR, locale: 'en-US' });
 const page = await context.newPage();
 const cdp = await context.newCDPSession(page);
 await cdp.send('Performance.enable');
@@ -59,9 +63,9 @@ const environment = {
 // ---------- 1. Frame pacing over a full match ----------
 // Default balance (spawn every 3 s, 180 s session). The hull is made durable so the whole match is played;
 // a simple input pattern keeps the ship sailing, turning and firing so all systems are exercised.
-await page.addInitScript(() => {
-  window.localStorage.setItem('pirate-battle:options:v1', JSON.stringify({ sessionSeconds: 180, spawnInterval: 3 }));
-});
+await page.addInitScript((spawnInterval) => {
+  window.localStorage.setItem('pirate-battle:options:v1', JSON.stringify({ sessionSeconds: 180, spawnInterval }));
+}, SPAWN);
 await open('&gameSeed=11');
 await startMatch();
 await page.evaluate(() => {
@@ -147,7 +151,7 @@ for (let c = 1; c <= CYCLES; c++) {
   cycles.push({ cycle: c, ...(await metrics()), canvasesAfterLeaving: canvases, heapDuringMatchMB: during.jsHeapMB });
 }
 
-const result = { measuredAt: new Date().toISOString(), environment, config: { sessionSeconds: 180, spawnInterval: 3 }, frameStats, memory: { baseline, cycles } };
+const result = { measuredAt: new Date().toISOString(), environment, config: { sessionSeconds: 180, spawnInterval: SPAWN }, frameStats, memory: { baseline, cycles } };
 mkdirSync('docs/profiling', { recursive: true });
 writeFileSync(process.env.PROFILE_OUT ?? 'docs/profiling/results.json', JSON.stringify(result, null, 2));
 console.log(JSON.stringify(result, null, 2));

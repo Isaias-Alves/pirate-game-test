@@ -4,6 +4,9 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ## [Unreleased]
 
+### Added
+- Profiler options `PROFILE_DPR` and `PROFILE_SPAWN`. Stress run at the heaviest allowed setting (enemy every 0.5 s: 93 entities at once) and a DPR 2 run both hold 60 FPS with a 16.7–16.8 ms p95; documented in docs/PERFORMANCE.md.
+
 ### Fixed
 - The sailing and ambience loops re-scheduled their volume on every frame (60 Web Audio automation events a second even at a steady speed); a loop is now re-scheduled only when its target volume changes by an audible amount (unit test with a fake AudioContext: 121 events over 2 s before, 0 after).
 - The screen-reader hull meter used a hard-coded 0.3 for its "low" mark instead of `gameConfig.feedback.lowHealthFraction`.

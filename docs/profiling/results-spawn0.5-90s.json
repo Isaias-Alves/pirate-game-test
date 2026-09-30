@@ -1,0 +1,59 @@
+{
+  "measuredAt": "2026-09-30T23:49:05.407Z",
+  "environment": {
+    "os": "Windows_NT 10.0.26200 (x64)",
+    "cpu": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz x6",
+    "ramGB": 15.8,
+    "browser": "Chromium 153.0.8010.12 (headless)",
+    "gpuRenderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00002188) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "viewport": "1280x720 @ DPR 1",
+    "build": "optimized production build (vite build --mode e2e), served by vite preview"
+  },
+  "config": {
+    "sessionSeconds": 180,
+    "spawnInterval": 0.5
+  },
+  "frameStats": {
+    "wallSeconds": 90.7,
+    "simSeconds": 90.8,
+    "frames": 5437,
+    "avgFps": 60,
+    "frameMs": {
+      "mean": 16.67,
+      "p50": 16.7,
+      "p95": 16.7,
+      "p99": 16.8,
+      "max": 16.8
+    },
+    "framesOver20ms": 0,
+    "framesOver33ms": 0,
+    "longFrames": [],
+    "entities": {
+      "avg": 55.1,
+      "max": 93,
+      "maxEnemies": 81,
+      "maxProjectiles": 17
+    },
+    "endPhase": "playing",
+    "score": 29
+  },
+  "memory": {
+    "baseline": {
+      "jsHeapMB": 6.13,
+      "domNodes": 413,
+      "listeners": 176,
+      "documents": 1
+    },
+    "cycles": [
+      {
+        "cycle": 1,
+        "jsHeapMB": 7.77,
+        "domNodes": 416,
+        "listeners": 189,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.53
+      }
+    ]
+  }
+}

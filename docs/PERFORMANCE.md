@@ -39,6 +39,17 @@ An earlier run the same afternoon ([profiling/results-previous-run.json](profili
 
 The 60 FPS target is met with the display's refresh rate as the ceiling (every frame lands on the 16.7 ms vsync interval). Because the game is single-scene and the entity count stays small, the workload is far below what the GPU can do; a higher-refresh display would run proportionally faster.
 
+### Stress and high-density checks
+
+Same machine and build, same scripted input, shorter runs.
+
+| Run | Average FPS | p95 frame time | Max frame | Entities (max) | Source |
+| --- | ---: | ---: | ---: | --- | --- |
+| **Heaviest setting Options allows**: enemy every 0.5 s, 90 s, durable hull so enemies pile up | 60.0 | 16.7 ms | 16.8 ms | 93 (81 enemies, 17 projectiles) | [results-spawn0.5-90s.json](profiling/results-spawn0.5-90s.json) |
+| **Device pixel ratio 2** (2560×1440 backing store at 1280×720 CSS), default setup, 60 s | 60.0 | 16.8 ms | 33.3 ms (one frame) | 14 | [results-dpr2-60s.json](profiling/results-dpr2-60s.json) |
+
+Eight times the usual enemy count keeps every frame on the vsync interval: ship-to-ship separation is O(n²) but ~3 000 pair checks per step at 81 enemies are negligible, and the renderer only moves existing sprites. Rendering at twice the density (4× the pixels) does not change frame pacing either.
+
 ### Software rendering (worst case)
 
 Headless Chromium without a GPU renders WebGL on the CPU (SwiftShader). A 15-second run in that mode ([profiling/results-software-gl-15s.json](profiling/results-software-gl-15s.json)) averaged **30.9 FPS** (p50 33.3 ms, p95 33.5 ms, max 66.7 ms). This is the mode the automated Playwright tests run in; it is why they run with two workers (one with `PW_SLOW=1`), and it shows the floor on a machine with no usable GPU.
@@ -78,7 +89,7 @@ The diff also led to one clean-up that did not change these numbers: Pixi 8 free
 ## Limitations
 
 - Numbers come from one machine. They are a reference for this hardware, not a guarantee for phones; touch devices were exercised for layout and behaviour in Playwright's mobile emulation, not profiled on a physical device.
-- Frame pacing was measured at DPR 1. At higher DPR the renderer caps at 2× (`MAX_RESOLUTION`), which increases fill cost roughly fourfold on a 2× display; the scene is simple, so this is expected to be comfortable on current hardware but was not measured here.
+- The main run is at DPR 1; a 60-second run at DPR 2 (the renderer's cap, `MAX_RESOLUTION`) showed the same frame pacing on this GPU. Phones have weaker GPUs and were not profiled on a device.
 - The simulation is not interpolated between its 60 Hz fixed steps; on displays faster than 60 Hz frames may repeat a state.
 - Heap numbers are `JSHeapUsedSize` after a forced collection; GPU memory is not included.
 - The heap keeps a slope of ~20–27 KB per cycle after warm-up. The heap-snapshot diff attributes it to compiled code and browser-held request/performance records, not to objects created by a match; a very long session (hundreds of matches in one tab) was not measured.
@@ -89,6 +100,7 @@ The diff also led to one clean-up that did not change these numbers: Pixi 8 free
 npm run profile                                   # builds the e2e bundle, then profiles (software GL by default)
 PROFILE_GPU=1 npm run profile                     # request hardware GL (Windows/D3D11), as used for this report
 PROFILE_SECONDS=180 PROFILE_CYCLES=5 PROFILE_GPU=1 node scripts/profile.mjs   # explicit settings (needs the e2e build served on :4174)
+PROFILE_DPR=2 PROFILE_SPAWN=0.5 PROFILE_SECONDS=90 PROFILE_GPU=1 node scripts/profile.mjs  # stress / high-density variants
 npm run profile:heap                              # heap-snapshot diff, cycle 10 vs cycle 25 (needs the e2e build served on :4174)
 ```
 

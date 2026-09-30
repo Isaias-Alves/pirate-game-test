@@ -4,6 +4,9 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ## [Unreleased]
 
+### Added
+- Published at https://pirate-game-test.vercel.app (Vercel). Checked on the live site: the MSW service worker controls the page, lists load, failure scenarios show retries and recover, and a match recorded under "Recording unavailable" is kept, re-sent after a reload and listed once.
+
 ## [1.1.0] — 2026-09-30
 
 UI improvement track, built on top of 1.0.0. Every item is checked against [CHALLENGE.md](CHALLENGE.md) before it is built and ships with regression tests; progress is tracked in [CLAUDE.md](CLAUDE.md) ("Melhorias de interface") and [PROGRESS.md](PROGRESS.md).

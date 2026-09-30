@@ -102,11 +102,11 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 - [x] Fase 12 — limpeza/passagem com Strict Mode (disposal audit; texture sets cached per density; 10 Play→Menu cycles + 20 restarts checked in browser: 0 leftover canvases, no errors, heap flat; formal memory profile in phase 14)
 - [x] Fase 13 — suíte Playwright (150 tests green: 75 x chromium-desktop + chromium-mobile; all 12 mandatory flows + visual regression baselines for menu, arena, arena+touch, pause, result, options; HTML report + traces on failure)
 - [x] Fase 14 — docs + profiling (README, ARCHITECTURE, docs/PERFORMANCE.md: 60 FPS avg, p95 16.7 ms over a 3-min match on GTX 1650; heap plateaus over 25 cycles; licenses/)
-- [ ] Fase 15 — deploy (fazer cedo, repetir sempre)
+- [x] Fase 15 — deploy: https://pirate-game-test.vercel.app (feito pelo dono em 30/09/2026; Vercel com preset Vite, sem variáveis. Verificado: worker do MSW controlando a página, ranking carregando, cenários 5xx/timeout com retries visíveis e recuperação, partida completa com "Recording unavailable" → pendente salvo → reload → reenvio automático → 1 registro no histórico, sem duplicar; nenhum erro de JS)
 
 ## Versão atual
 
-**v1.1.0** (tag git `v1.1.0`, 30/09/2026) — v1.0.0 + melhorias de interface UI-1…UI-8. Suíte completa 184/184 (relatório em `docs/test-report/`), 94 testes unitários, profiling refeito (`docs/PERFORMANCE.md`). Falta só o deploy, que o dono do projeto fará pessoalmente — **não fazer deploy**; quando ele mandar a URL: verificar o site publicado (worker do MSW ativo, pendentes sobrevivem a reload) e colocar a URL no topo do README. Detalhes em `CHANGELOG.md`. Versão anterior: `git checkout v1.0.0`.
+**v1.1.0** (tag git `v1.1.0`, 30/09/2026) — v1.0.0 + melhorias de interface UI-1…UI-8. Suíte completa 184/184 (relatório em `docs/test-report/`), 94 testes unitários, profiling refeito (`docs/PERFORMANCE.md`). Publicado em https://pirate-game-test.vercel.app (deploy feito pelo dono; cada push no `main` republica). Detalhes em `CHANGELOG.md`. Versão anterior: `git checkout v1.0.0`.
 
 ## Melhorias de interface (pós-v1.0.0)
 

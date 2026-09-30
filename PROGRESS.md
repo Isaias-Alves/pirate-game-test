@@ -92,7 +92,7 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 - Full suite 184/184 in 39 min (PW_SLOW); report committed at `docs/test-report/index.html`.
 - Profiling (GPU, machine not quiet: CPU ~37% from other apps): 60 FPS, p95 16.7 ms. First run had one 150 ms frame; the script now logs `longFrames` (time + duration) and the repeat run did not reproduce it (worst 33.4 ms). Both runs are in `docs/profiling/`.
 - 25-cycle memory: warm-up to 8.7 MB by cycle 11, then ~20 KB/match slope (DOM/listeners/canvases flat). Not traced; documented as a limitation (suspect: per-match AudioContext).
-- Only thing left: deploy by the owner, then README URL + checking the published site.
+- Deployed by the owner: https://pirate-game-test.vercel.app — verified live (SW active, lists, 5xx/timeout scenarios, full match with pending → reload → auto re-send → 1 history row, no JS errors). README updated. All 15 phases done.
 
 ### Final round (original plan)
 1. Full suite `PW_SLOW=1 npm run test:e2e` (list + html reporters) → expect 184 tests (15 files).

@@ -4,7 +4,7 @@ A top-down 2D naval shooter for the browser. Sail between islands, sink Chasers 
 
 Built with **React + TypeScript (strict)** for the UI, **PixiJS** for the game scene, **TanStack Query + Axios** for the ranking and match history, **MSW** for the mock REST API (also in the published build) and **Playwright** for end-to-end and visual-regression tests.
 
-- Live demo: _add the public URL here after deploying (see [Deploy](#deploy))_
+- **Live demo: https://pirate-game-test.vercel.app** (Vercel; the mock API runs there through the MSW service worker)
 - Architecture and decisions: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Performance and memory report: [docs/PERFORMANCE.md](docs/PERFORMANCE.md)
 - Living build log: [PROGRESS.md](PROGRESS.md)
@@ -135,7 +135,7 @@ Reproduce a run without the UI: `?scenario=submit-timeout&seed=7&latency=0` (`la
 
 ## Deploy
 
-The output of `npm run build` is a static site (`dist/`). For Vercel: import the repository, framework preset "Vite", build command `npm run build`, output directory `dist`. The MSW worker (`mockServiceWorker.js`) is copied from `public/` automatically, so the mock API runs on the published site. Netlify and Cloudflare Pages work the same way. The published URL is the one to put at the top of this file.
+The output of `npm run build` is a static site (`dist/`). For Vercel: import the repository, framework preset "Vite", build command `npm run build`, output directory `dist`. The MSW worker (`mockServiceWorker.js`) is copied from `public/` automatically, so the mock API runs on the published site. Netlify and Cloudflare Pages work the same way. The published build lives at https://pirate-game-test.vercel.app (Vercel defaults: preset Vite, `npm run build`, output `dist`, Node 22.x, no environment variables).
 
 ## Credits and licences
 

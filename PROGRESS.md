@@ -88,7 +88,13 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 - UI-8: `ControlsList` extracted from `ControlsLegend` and reused in the pause dialog (`<details>`); Dialog focus trap includes `summary`; arena host `role="img"` "Battle arena"; favicon = player ship (`ship_5.png`, bundled by Vite from index.html).
 - Deploy: the owner will deploy personally — do NOT deploy. When they send the URL: check the published site (MSW worker active, reload keeps pending records) and put the URL at the top of README.md.
 
-### Final round (in this order)
+### Final round — DONE (v1.1.0)
+- Full suite 184/184 in 39 min (PW_SLOW); report committed at `docs/test-report/index.html`.
+- Profiling (GPU, machine not quiet: CPU ~37% from other apps): 60 FPS, p95 16.7 ms. First run had one 150 ms frame; the script now logs `longFrames` (time + duration) and the repeat run did not reproduce it (worst 33.4 ms). Both runs are in `docs/profiling/`.
+- 25-cycle memory: warm-up to 8.7 MB by cycle 11, then ~20 KB/match slope (DOM/listeners/canvases flat). Not traced; documented as a limitation (suspect: per-match AudioContext).
+- Only thing left: deploy by the owner, then README URL + checking the published site.
+
+### Final round (original plan)
 1. Full suite `PW_SLOW=1 npm run test:e2e` (list + html reporters) → expect 184 tests (15 files).
 2. Copy `playwright-report/` → `docs/test-report/` and link it from README "Testing".
 3. Re-profile (`PROFILE_GPU=1 npm run profile`) on a quiet machine, update docs/PERFORMANCE.md.

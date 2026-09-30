@@ -106,7 +106,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 
 ## Versão atual
 
-**v1.0.0** (tag git `v1.0.0`, 29/09/2026) — todas as funcionalidades do desafio prontas e testadas, exceto o deploy. Detalhes em `CHANGELOG.md`. Para voltar a esse estado: `git checkout v1.0.0`.
+**v1.1.0** (tag git `v1.1.0`, 30/09/2026) — v1.0.0 + melhorias de interface UI-1…UI-8. Suíte completa 184/184 (relatório em `docs/test-report/`), 94 testes unitários, profiling refeito (`docs/PERFORMANCE.md`). Falta só o deploy, que o dono do projeto fará pessoalmente — **não fazer deploy**; quando ele mandar a URL: verificar o site publicado (worker do MSW ativo, pendentes sobrevivem a reload) e colocar a URL no topo do README. Detalhes em `CHANGELOG.md`. Versão anterior: `git checkout v1.0.0`.
 
 ## Melhorias de interface (pós-v1.0.0)
 

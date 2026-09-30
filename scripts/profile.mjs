@@ -111,6 +111,8 @@ const frameStats = {
   frameMs: { mean: +mean.toFixed(2), p50: +pct(sorted, 50).toFixed(2), p95: +pct(sorted, 95).toFixed(2), p99: +pct(sorted, 99).toFixed(2), max: +sorted[sorted.length - 1].toFixed(2) },
   framesOver20ms: run.frames.filter((f) => f > 20).length,
   framesOver33ms: run.frames.filter((f) => f > 33.4).length,
+  // When each long frame happened (seconds since sampling started), to tell a one-off hitch from a pattern.
+  longFrames: run.frames.reduce((acc, f) => ({ t: acc.t + f, list: f > 33.4 ? [...acc.list, { atSecond: +((acc.t + f) / 1000).toFixed(1), ms: +f.toFixed(1) }] : acc.list }), { t: 0, list: [] }).list,
   entities: { avg: +(entities.reduce((a, b) => a + b, 0) / entities.length).toFixed(1), max: Math.max(...entities), maxEnemies: Math.max(...run.entities.map((e) => e.enemies)), maxProjectiles: Math.max(...run.entities.map((e) => e.projectiles)) },
   endPhase: run.phase,
   score: run.score,

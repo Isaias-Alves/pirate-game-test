@@ -106,7 +106,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 
 ## Versão atual
 
-**v1.1.0** (tag git `v1.1.0`, 30/09/2026) — v1.0.0 + melhorias de interface UI-1…UI-8. Suíte completa 184/184 (relatório em `docs/test-report/`), 94 testes unitários, profiling refeito (`docs/PERFORMANCE.md`). Publicado em https://pirate-game-test.vercel.app (deploy feito pelo dono; cada push no `main` republica). Detalhes em `CHANGELOG.md`. Versão anterior: `git checkout v1.0.0`.
+**v1.1.1** (tag git `v1.1.1`, 30/09/2026; antes: `v1.1.0`) — v1.0.0 + melhorias de interface UI-1…UI-8. Suíte completa 184/184 (relatório em `docs/test-report/`), 94 testes unitários, profiling refeito (`docs/PERFORMANCE.md`). Publicado em https://pirate-game-test.vercel.app (deploy feito pelo dono; cada push no `main` republica). Depois da v1.1.0 (30/09 à noite): auditoria completa contra o CHALLENGE.md (tudo atendido), correção da separação navio×ilha, diff de heap (`npm run profile:heap`), spec de acessibilidade (axe + contraste medido) e texto dos botões dourados mais escuro — ver PROGRESS.md. Detalhes em `CHANGELOG.md`. Versão anterior: `git checkout v1.0.0`.
 
 ## Melhorias de interface (pós-v1.0.0)
 

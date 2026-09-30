@@ -99,3 +99,10 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 2. Copy `playwright-report/` → `docs/test-report/` and link it from README "Testing".
 3. Re-profile (`PROFILE_GPU=1 npm run profile`) on a quiet machine, update docs/PERFORMANCE.md.
 4. CHANGELOG `[1.1.0]`, bump package.json version, tag `v1.1.0`, update CLAUDE.md "Versão atual", push.
+
+## ▶ 2026-09-30 (evening) — compliance audit + post-1.1.0 improvements
+- Re-audited CHALLENGE.md section by section: everything met. Verified today: live deploy (SW, scenarios, pending → reload → re-send), clean clone from GitHub (`npm ci`, typecheck, lint, 95 unit, build).
+- `31723e6` fix: `separate()` in enemyAI now re-applies arena/island limits (unit test reproduced a ship 12 units inside an island); Graphics destroyed with `context: true`; handled failures use `console.warn`; `npm run profile:heap` (scripts/heap-diff.mjs) — the residual ~27 KB/cycle is V8 compiled code + browser-held request/perf records, zero app/Pixi/query/audio objects grow; README orientation + baseline list.
+- `0c22789` test(a11y): axe WCAG 2.1 AA spec + measured contrast over sprite art (axe marks it "incomplete" on images/gradients). Found gold buttons at 4.2–4.4:1 on short screens → `--ink-deep` #2a1606 (~4.9:1).
+- Gotcha: `getComputedStyle` is live — read values before mutating classes (first contrast run reported 1.00:1 everywhere).
+- Full suite 192/192 (26.5 min, PW_SLOW); report refreshed in `docs/test-report/`; released as v1.1.1 (tag).

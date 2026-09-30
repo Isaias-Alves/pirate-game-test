@@ -4,6 +4,10 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ## [Unreleased]
 
+## [1.1.1] — 2026-09-30
+
+Compliance audit against CHALLENGE.md after the deploy, and the fixes it produced. Full suite 192/192 (report in [docs/test-report/](docs/test-report/index.html)), unit 95/95.
+
 ### Added
 - Published at https://pirate-game-test.vercel.app (Vercel). Checked on the live site: the MSW service worker controls the page, lists load, failure scenarios show retries and recover, and a match recorded under "Recording unavailable" is kept, re-sent after a reload and listed once.
 - `npm run profile:heap` ([scripts/heap-diff.mjs](scripts/heap-diff.mjs)): heap-snapshot diff between cycle 10 and cycle 25. [docs/PERFORMANCE.md](docs/PERFORMANCE.md) now explains the residual heap slope: compiled code and browser-held request/performance records; no game, Pixi, query or audio object accumulates.

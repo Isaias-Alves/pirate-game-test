@@ -43,3 +43,35 @@ Update this file whenever a phase finishes or a non-obvious decision is made. Ev
 
 ## v1.0.0 (tag) — 2026-09-29
 Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-1..UI-8 (plan + requirement check in CLAUDE.md "Melhorias de interface"). Rules for the track: one improvement per commit; before each, re-read CHALLENGE.md for the areas it touches; after each: lint, typecheck, unit, affected e2e specs, visual baselines (update ONLY after inspecting the new images and only for intended changes); full e2e suite at checkpoints (after UI-3, UI-5, UI-8).
+
+## ⏸ PAUSED HERE — 2026-09-29 23:18 (resume from this section)
+
+### Where we are
+- Track: UI improvements UI-1..UI-8 (plan + requirement check in CLAUDE.md "Melhorias de interface").
+- DONE and committed, each with regression tests: UI-1 fire on damaged ships (`c51c90e`), UI-2 health readability + stricter visual tolerance (`d6e191e`), UI-3 arena framing + compact HUD (`9909f3e`, full e2e 156/156 green = last fully green state).
+- IN PROGRESS: UI-4 sound. Committed as `wip(ui-4)` right after `9909f3e` so nothing is lost.
+
+### UI-4 — what is already done (in the wip commit)
+- `src/game/audio/`: `soundMap.ts` (pure SimEvent -> sound cues, dedupe per frame; unit-tested in `soundMap.test.ts`), `AudioEngine.ts` (Web Audio wrapper; every failure swallowed; decoded buffers cached per visit; loops with fade), `GameAudio.ts` (glue: start/frame/paused/resumed/ended; ocean ambience + sailing loop scaled by speed; score, low-health and 10 s warning stings).
+- Sim: `SimEvent 'shot'` now carries `weapon: 'front' | 'side' | 'enemy'`; new `'rammed'` event when a Chaser hits the player. `Simulation.fire(..., kind)` has a default so old callers/tests still work.
+- `Game`: constructor now takes `options { seed, muted, onMuteChange }` (was `seed`); `present()` hands each frame's events to renderer AND audio; `setMuted/toggleMute/isMuted`; audio hooked into pause/resume/restart/finish/dispose. `MatchSnapshot.muted` added. Keyboard `M` toggles mute (only while the match screen is mounted).
+- UI: HUD sound toggle button (authored SVG speaker, `aria-pressed`, `data-testid="mute"`), placed left of pause; `.hud-pause` CSS renamed to generic `.hud-round`. Preference persisted in `pirate-battle:sound:v1` (`src/storage/sound.ts`); `MatchScreen` passes `loadMuted()/saveMuted`.
+- Tests: unit 88/88; `e2e/sound.spec.ts` (sounds start on firing without console errors — spy on `AudioBufferSourceNode.start`, one-shots only; mute button + persistence after reload; M only during a match; mute while paused) 16/16 with `--repeat-each=2`. Checked manually: sounds start in dev, portrait 390 px HUD still fits with the extra button.
+- Requirement check (CHALLENGE.md): sound is an allowed complementary resource from the asset pack; failures are silent (console stays clean); loops fade on pause; M captured only in gameplay; Options still exposes exactly the two required settings.
+
+### UI-4 — what is left (do in this order)
+1. `npm run build:e2e && npx playwright test e2e/visual.spec.ts --update-snapshots` — the 10 match-screen baselines (arena, arena-damaged, arena-touch, pause, result × desktop/mobile) change because of the new HUD button; menu/options must NOT change. Open and inspect the regenerated PNGs, then run visual.spec twice more to confirm stability.
+2. Full regression (Game core changed): `npx playwright test` in the background (~17 min). Expect 164 tests (156 + 8 sound).
+3. CHANGELOG `[Unreleased] > Added` entry for UI-4, tick UI-4 in CLAUDE.md, remove the "Pausa" section from CLAUDE.md, commit `feat(ui-4): ...` (squash-free: just a new commit on top of the wip one is fine).
+4. Continue with UI-5 (ranking setup selector), UI-6 (rank on result), UI-7 (retry feedback + shorter default timeout), UI-8 (controls reminder in pause dialog, favicon, canvas label, rotate hint). Full suite checkpoints after UI-5 and UI-8.
+
+### Still pending outside the UI track
+- Phase 15 deploy (needs the owner's Vercel/Netlify/Cloudflare account) + public URL at the top of README.md.
+- Commit the Playwright HTML report under `docs/` (challenge §11 "Inclua os relatórios de testes"): run the full suite with `--reporter=list,html`, copy `playwright-report/` to e.g. `docs/test-report/`.
+
+### Working notes / gotchas
+- Some files are CRLF after git checkouts: normalize with `sed -i 's/\r$//' <files>` before Node string-replace edits. In Node scripts, `/tmp` must be converted with `cygpath -w /tmp`.
+- `npm run test:e2e` = build + test. When running `npx playwright test` directly, run `npm run build:e2e` first (the web server only serves `dist-e2e`).
+- Visual tolerance is `maxDiffPixels: 60`: any intended visual change requires regenerating AND inspecting baselines.
+- The built-in browser pane counts as a hidden tab → the game auto-pauses there; use `?clock=manual&gameSeed=1` and `window.__game.advance(s)` for manual checks.
+- Full suite takes ~17 min with 2 workers; run it in the background.

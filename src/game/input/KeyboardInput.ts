@@ -13,6 +13,7 @@ const KEY_MAP: Record<string, keyof InputState> = {
 };
 
 const PAUSE_KEYS = new Set(['Escape', 'KeyP']);
+const MUTE_KEY = 'KeyM';
 
 /**
  * Writes held keys into a shared InputState. Listeners exist only between attach() and detach(),
@@ -26,6 +27,7 @@ export class KeyboardInput {
   constructor(
     private readonly state: InputState,
     private readonly onPauseKey: () => void,
+    private readonly onMuteKey: () => void = () => undefined,
   ) {}
 
   attach(): void {
@@ -60,6 +62,11 @@ export class KeyboardInput {
     if (PAUSE_KEYS.has(e.code)) {
       e.preventDefault();
       if (!e.repeat) this.onPauseKey();
+      return;
+    }
+    if (e.code === MUTE_KEY) {
+      e.preventDefault();
+      if (!e.repeat) this.onMuteKey();
       return;
     }
     const action = KEY_MAP[e.code];

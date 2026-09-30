@@ -4,7 +4,7 @@ import { clampToArena, pushOutOfCircle, segmentHitsCircle } from './collision';
 import { stepEnemies } from './enemyAI';
 import { createRng, type Rng } from './rng';
 import { stepSpawner } from './spawner';
-import { PLAYER_ID, type Enemy, type Owner, type Projectile, type SimEvent } from './types';
+import { PLAYER_ID, type Enemy, type Owner, type Projectile, type SimEvent, type WeaponKind } from './types';
 
 export interface PlayerShip {
   x: number;
@@ -145,7 +145,7 @@ export class Simulation {
 
     if (input.fireFront && cd.front === 0) {
       cd.front = config.player.front.cooldown;
-      this.fire('player', p.x + Math.cos(p.angle) * p.radius, p.y + Math.sin(p.angle) * p.radius, p.angle, config.player.front);
+      this.fire('player', p.x + Math.cos(p.angle) * p.radius, p.y + Math.sin(p.angle) * p.radius, p.angle, config.player.front, 'front');
     }
     if (input.fireLeft && cd.left === 0) {
       cd.left = config.player.side.cooldown;
@@ -168,12 +168,12 @@ export class Simulation {
     const ny = Math.sin(angle);
     for (let i = 0; i < count; i++) {
       const along = (i - (count - 1) / 2) * spacing;
-      this.fire('player', p.x + fx * along + nx * p.radius, p.y + fy * along + ny * p.radius, angle, config.player.side);
+      this.fire('player', p.x + fx * along + nx * p.radius, p.y + fy * along + ny * p.radius, angle, config.player.side, 'side');
     }
   }
 
   /** Spawns one projectile. Shared by the player and enemy shooters. */
-  fire(owner: Owner, x: number, y: number, angle: number, weapon: WeaponStats): void {
+  fire(owner: Owner, x: number, y: number, angle: number, weapon: WeaponStats, kind: WeaponKind = owner === 'enemy' ? 'enemy' : 'front'): void {
     this.projectiles.push({
       x,
       y,
@@ -186,7 +186,7 @@ export class Simulation {
       owner,
       alive: true,
     });
-    this.events.push({ type: 'shot', x, y, angle, owner });
+    this.events.push({ type: 'shot', x, y, angle, owner, weapon: kind });
   }
 
   /**

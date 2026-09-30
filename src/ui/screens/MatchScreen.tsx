@@ -8,6 +8,7 @@ import type { MatchResult } from '../../game/matchStore';
 import { exposeGame, readTestOptions } from '../../game/testHooks';
 import { loadOptions, matchConfig } from '../../storage/options';
 import { saveLastResult } from '../../storage/results';
+import { loadMuted, saveMuted } from '../../storage/sound';
 import { Hud } from '../Hud';
 import { LiveStatus } from '../LiveStatus';
 import { PauseOverlay } from '../PauseOverlay';
@@ -98,7 +99,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
         }
 
         const test = readTestOptions();
-        current = new Game(app, textures, matchConfig(loadOptions()), test.gameSeed);
+        current = new Game(app, textures, matchConfig(loadOptions()), { seed: test.gameSeed, muted: loadMuted(), onMuteChange: saveMuted });
         current.manualClock = test.manualClock;
         current.onMatchEnd((r) => {
           saveLastResult(r);

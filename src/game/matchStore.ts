@@ -13,6 +13,7 @@ export interface MatchSnapshot {
   endReason: EndReason | null;
   /** Why the match is paused, so the pause dialog can explain an automatic pause. */
   pauseCause: 'manual' | 'focus' | null;
+  muted: boolean;
 }
 
 export interface MatchResult {
@@ -35,6 +36,7 @@ export const initialSnapshot: MatchSnapshot = {
   maxHealth: 0,
   endReason: null,
   pauseCause: null,
+  muted: false,
 };
 
 const same = (a: MatchSnapshot, b: MatchSnapshot): boolean =>
@@ -44,7 +46,8 @@ const same = (a: MatchSnapshot, b: MatchSnapshot): boolean =>
   a.health === b.health &&
   a.maxHealth === b.maxHealth &&
   a.endReason === b.endReason &&
-  a.pauseCause === b.pauseCause;
+  a.pauseCause === b.pauseCause &&
+  a.muted === b.muted;
 
 /**
  * Minimal external store for `useSyncExternalStore`. The game pushes a fresh snapshot every tick, but

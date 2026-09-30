@@ -1,5 +1,6 @@
 import type { Application, Ticker } from 'pixi.js';
 import type { GameTextures } from './assets';
+import { GameAudio } from './audio/GameAudio';
 import type { GameConfig } from './gameConfig';
 import { emptyInput, type InputState } from './input/InputState';
 import { KeyboardInput } from './input/KeyboardInput';
@@ -14,12 +15,26 @@ import { newId } from '../storage/ids';
  *
  * The simulation advances in fixed steps from an accumulator, so behaviour does not depend on frame rate.
  */
+export interface GameOptions {
+  /** Simulation seed; defaults to the clock. */
+  seed?: number | undefined;
+  muted?: boolean;
+  /** Called when the player toggles sound (button or M key), so the UI can remember the choice. */
+  onMuteChange?: (muted: boolean) => void;
+}
+
 export class Game {
   readonly store = new MatchStore();
   readonly input = emptyInput();
-  private readonly keyboard = new KeyboardInput(this.input, () => {
-    this.togglePause();
-  });
+  private readonly keyboard = new KeyboardInput(
+    this.input,
+    () => {
+      this.togglePause();
+    },
+    () => {
+      this.toggleMute();
+    },
+  );
   private readonly endListeners = new Set<(result: MatchResult) => void>();
   private simulation: Simulation;
   private renderer: Renderer;
@@ -27,6 +42,9 @@ export class Game {
   private phase: MatchPhase = 'playing';
   private pauseCause: MatchSnapshot['pauseCause'] = null;
   private disposed = false;
+  private readonly audio: GameAudio;
+  private muted: boolean;
+  private readonly onMuteChange: ((muted: boolean) => void) | undefined;
   /** Test instrumentation: when true the wall-clock ticker never steps the simulation; only advance() does. */
   manualClock = false;
 
@@ -34,9 +52,13 @@ export class Game {
     private readonly app: Application,
     private readonly textures: GameTextures,
     private config: GameConfig,
-    seed = Date.now(),
+    options: GameOptions = {},
   ) {
-    this.simulation = new Simulation(config, seed);
+    this.simulation = new Simulation(config, options.seed ?? Date.now());
+    this.muted = options.muted ?? false;
+    this.onMuteChange = options.onMuteChange;
+    this.audio = new GameAudio(this.muted, config.feedback.lowHealthFraction);
+    this.audio.start();
     this.renderer = new Renderer(app, this.simulation, textures);
     this.keyboard.attach();
     window.addEventListener('blur', this.onFocusLost);
@@ -51,6 +73,22 @@ export class Game {
 
   get currentPhase(): MatchPhase {
     return this.phase;
+  }
+
+  get isMuted(): boolean {
+    return this.muted;
+  }
+
+  setMuted(muted: boolean): void {
+    if (muted === this.muted) return;
+    this.muted = muted;
+    this.audio.setMuted(muted);
+    this.onMuteChange?.(muted);
+    this.publish();
+  }
+
+  toggleMute(): void {
+    this.setMuted(!this.muted);
   }
 
   /** Subscribes to the end of a match. Fires once per match. */
@@ -76,6 +114,7 @@ export class Game {
     this.phase = 'paused';
     this.pauseCause = cause;
     this.keyboard.setCapture(false);
+    this.audio.paused();
     this.publish();
   }
 
@@ -86,6 +125,7 @@ export class Game {
     this.pauseCause = null;
     this.accumulator = 0;
     this.keyboard.setCapture(true);
+    this.audio.resumed();
     this.publish();
   }
 
@@ -104,6 +144,7 @@ export class Game {
     this.phase = 'playing';
     this.pauseCause = null;
     this.keyboard.setCapture(true);
+    this.audio.start();
     this.publish();
   }
 
@@ -112,7 +153,7 @@ export class Game {
     if (this.phase !== 'playing') return;
     const { fixedStep } = this.config.simulation;
     for (let t = 0; t < seconds && this.isPlaying(); t += fixedStep) this.step(fixedStep);
-    this.renderer.handleEvents(this.sim.drainEvents());
+    this.present();
     this.renderer.update(0);
     this.publish();
   }
@@ -133,12 +174,19 @@ export class Game {
         this.step(fixedStep);
         this.accumulator -= fixedStep;
       }
-      this.renderer.handleEvents(this.sim.drainEvents());
+      this.present();
     }
     // Cosmetic timers (flash, shake, effects) run on wall time and freeze while paused.
     this.renderer.update(this.phase === 'paused' ? 0 : ticker.deltaMS / 1000);
     this.publish();
   };
+
+  /** Hands this frame's simulation events to the presentation layers (visual effects and sound). */
+  private present(): void {
+    const events = this.sim.drainEvents();
+    this.renderer.handleEvents(events);
+    this.audio.frame(events, this.sim);
+  }
 
   /** A method (not an inline comparison) so control-flow narrowing does not assume the phase is stable across step(). */
   private isPlaying(): boolean {
@@ -155,6 +203,9 @@ export class Game {
     this.keyboard.setCapture(false);
     const { sim } = this;
     if (!sim.endReason) return;
+    // Last frame's hits and explosions still get their sounds before the end sting.
+    this.present();
+    this.audio.ended(sim.endReason);
     const result: MatchResult = {
       matchId: newId(),
       score: sim.score,
@@ -177,6 +228,7 @@ export class Game {
       maxHealth: sim.player.maxHealth,
       endReason: sim.endReason,
       pauseCause: this.pauseCause,
+      muted: this.muted,
     });
   }
 
@@ -188,6 +240,7 @@ export class Game {
     document.removeEventListener('visibilitychange', this.onVisibility);
     this.keyboard.detach();
     this.endListeners.clear();
+    this.audio.dispose();
     this.renderer.destroy();
   }
 }

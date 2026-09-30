@@ -69,13 +69,14 @@ function stepShooter(sim: Simulation, e: Enemy, dt: number): void {
   const aimed = Math.abs(normalizeAngle(toPlayer - e.angle)) <= shooter.aimTolerance;
   if (clearShot && dist <= shooter.attackRange && aimed && e.cooldown === 0) {
     e.cooldown = shooter.weapon.cooldown;
-    sim.fire('enemy', e.x + Math.cos(e.angle) * e.radius, e.y + Math.sin(e.angle) * e.radius, e.angle, shooter.weapon);
+    sim.fire('enemy', e.x + Math.cos(e.angle) * e.radius, e.y + Math.sin(e.angle) * e.radius, e.angle, shooter.weapon, 'enemy');
   }
 }
 
 /** A Chaser that touches the player hurts them and is destroyed by the impact (no score). */
 function resolveContact(sim: Simulation, e: Enemy): void {
   if (e.kind !== 'chaser' || !circlesOverlap(e, sim.player)) return;
+  sim.pushEvent({ type: 'rammed', x: e.x, y: e.y });
   sim.damagePlayer(sim.config.chaser.contactDamage, e.x, e.y);
   e.health = 0;
   e.alive = false;

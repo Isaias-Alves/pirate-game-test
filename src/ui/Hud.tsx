@@ -47,6 +47,25 @@ function Counter({ icon, label, value, warn }: { icon: string; label: string; va
   );
 }
 
+/**
+ * Speaker icon drawn to match the atlas icons (cream fill, dark wood outline); the pack has no sound icon.
+ * With `muted` the waves are replaced by a cross.
+ */
+function SoundIcon({ muted }: { muted: boolean }) {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <g fill="#fbe8c4" stroke="#4a2e14" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round">
+        <path d="M8 19h8l10-8v26l-10-8H8z" />
+        {muted ? (
+          <path d="M32 18l10 12M42 18L32 30" fill="none" strokeWidth="4.5" />
+        ) : (
+          <path d="M32 17c3 2 4.5 4.6 4.5 7s-1.5 5-4.5 7M37 12c5 3.3 7.5 7.4 7.5 12S42 32.7 37 36" fill="none" strokeWidth="4" />
+        )}
+      </g>
+    </svg>
+  );
+}
+
 /** On-screen match HUD. Purely presentational: values come from the store, never per frame. */
 export function Hud({ game }: { game: Game }) {
   const m = useMatch(game);
@@ -58,7 +77,21 @@ export function Hud({ game }: { game: Game }) {
       <Counter icon="icon_score" label="score" value={String(m.score)} />
       <button
         type="button"
-        className="hud-pause"
+        className="hud-round hud-sound"
+        aria-label="Mute sound"
+        aria-pressed={m.muted}
+        title={m.muted ? "Sound off (M)" : "Sound on (M)"}
+        data-testid="mute"
+        onClick={(e) => {
+          e.currentTarget.blur();
+          game.toggleMute();
+        }}
+      >
+        <SoundIcon muted={m.muted} />
+      </button>
+      <button
+        type="button"
+        className="hud-round hud-pause"
         aria-label={m.phase === 'paused' ? 'Resume game' : 'Pause game'}
         disabled={m.phase === 'ended'}
         onClick={(e) => {

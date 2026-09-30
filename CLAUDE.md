@@ -80,8 +80,8 @@ npm run preview      # preview do build de produção
 npm run lint         # eslint
 npm run typecheck    # tsc --noEmit
 npm test             # vitest (pure simulation unit tests)
-npm run test:e2e     # playwright (not wired yet, phase 13)
-npm run test:e2e:ui  # (not wired yet, phase 13)
+npm run test:e2e     # build:e2e + playwright (PW_SLOW=1 on a busy machine: 1 worker, 3x timeouts)
+npm run test:e2e:ui  # same, Playwright UI mode
 ```
 
 ## Status atual
@@ -115,20 +115,12 @@ Uma de cada vez, cada uma com commit próprio e testes de regressão (lint + typ
 - [x] UI-1 — fogo nos navios danificados (sprites `fire_1`/`fire_2`, já carregados e sem uso). Enunciado: reforça "deterioração visual dos navios conforme a vida restante"; manter pequeno para não prejudicar a "leitura da arena".
 - [x] UI-2 — legibilidade da vida: barras dos inimigos vermelhas, do jogador verdes (âmbar/vermelho quando baixa) e "76 / 100" no HUD. Enunciado: "Exiba vida acima do navio do jogador e de cada inimigo" continua atendido.
 - [x] UI-3 — moldura da arena: preencher as faixas escuras (letterbox) com mar escurecido + borda de limite clara, e HUD mais compacto em telas baixas. **Não** sobrepor o HUD à arena como na imagem de referência: o enunciado exige "sem cortes na arena ou no HUD".
-- [~] UI-4 (EM ANDAMENTO — ver "Pausa" abaixo) — sons (assets/sounds) + botão de mudo persistido, pausando junto com o jogo e só iniciando após gesto do usuário. Enunciado: permitido ("recursos complementares"); console sem erros (autoplay).
+- [x] UI-4 — sons (assets/sounds) + botão de mudo persistido, pausando junto com o jogo e só iniciando após gesto do usuário. Enunciado: permitido ("recursos complementares"); console sem erros (autoplay).
 - [ ] UI-5 — ranking: seletor de configuração (padrão = opções atuais). Enunciado: continua comparando só partidas com a mesma configuração.
 - [ ] UI-6 — resultado: mostrar a posição no ranking depois que a partida for registrada. Enunciado: resultado continua com pontuação, tempo, motivo, situação do registro e as duas ações.
 - [ ] UI-7 — feedback de rede nas listas: mostrar tentativas ("retrying 1/2") e timeout padrão menor. Enunciado: "Gerencie carregamento, vazio, erro, atualização em segundo plano… e retries".
 - [ ] UI-8 — polimento: lembrete de controles no diálogo de pausa, favicon, rótulo acessível no canvas, aviso de "gire o aparelho" sem quebra. Enunciado: "Apresente os comandos na interface".
 
-## ⏸ Pausa — onde paramos (29/09/2026 23:18)
-
-**Leia isto primeiro ao retomar.** Detalhes completos na seção "PAUSED HERE" do `PROGRESS.md`.
-
-- Último estado 100% verde: commit `9909f3e` (UI-3). Versão documentada: tag `v1.0.0`.
-- Commit seguinte (`wip(ui-4)`) = sons, **código pronto e testes de som passando, mas regressão incompleta**: as baselines visuais das telas de partida ainda NÃO foram regeneradas (o HUD ganhou o botão de som), então `e2e/visual.spec.ts` falha até isso ser feito.
-- Próximo passo exato: regenerar e inspecionar baselines da UI-4 → suíte completa → CHANGELOG/checkbox → commit `feat(ui-4)` → seguir para UI-5.
-- Pendências fora da trilha de UI: deploy (Fase 15) e incluir o relatório HTML do Playwright em `docs/` (exigência do enunciado §11).
 
 ## Prazo
 

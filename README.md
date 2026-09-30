@@ -49,6 +49,7 @@ All optional. They only tune network behaviour and are read at build time.
 | `npm run profile` | Frame-time and memory profiling (see [docs/PERFORMANCE.md](docs/PERFORMANCE.md)) |
 
 The first Playwright run needs the browser: `npx playwright install chromium`.
+On a busy or low-end machine run `PW_SLOW=1 npm run test:e2e` (PowerShell: `$env:PW_SLOW=1; npm run test:e2e`): one worker and 3x longer timeouts. The arena renders with software WebGL in headless Chromium, so a loaded CPU shows up as timeouts rather than real failures.
 Visual baselines live in `e2e/__screenshots__/`; refresh them with `npx playwright test e2e/visual.spec.ts --update-snapshots`.
 
 ## Controls
@@ -60,6 +61,7 @@ Visual baselines live in `e2e/__screenshots__/`; refresh them with `npx playwrig
 | Front cannon (1 shot) | `Space` | Front cannon button |
 | Left / right broadside (3 parallel shots) | `Q` / `E` | Side cannon buttons |
 | Pause / resume | `Esc` / `P` | Pause button in the HUD |
+| Sound on / off | `M` | Speaker button in the HUD (the choice is remembered) |
 
 Everything can be held at the same time (sail, turn and fire). Touch buttons track their own finger, so several can be held together. The game pauses by itself when the window loses focus or the tab is hidden, and resuming always needs a click or key press. On phones, landscape gives the biggest arena (portrait works and shows a hint).
 

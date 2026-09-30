@@ -40,6 +40,12 @@ export function ControlsLegend() {
             <kbd>Esc</kbd> <kbd>P</kbd>
           </dd>
         </div>
+        <div>
+          <dt>Sound on / off</dt>
+          <dd>
+            <kbd>M</kbd>
+          </dd>
+        </div>
       </dl>
       <p className="controls__note">On touch screens, use the buttons on the sides of the arena. Hold several at once to sail and fire together.</p>
     </section>

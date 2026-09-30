@@ -8,8 +8,11 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 - UI-1: fires break out on heavily damaged ships (one flame) and wrecks (two flames), using the pack's `fire_1`/`fire_2` sprites; they flicker on wall time, freeze while paused and stay still with prefers-reduced-motion. New visual baseline `arena-damaged`.
 - UI-2: health at a glance: enemy bars are always red, the player's bar is green (red when low), and the HUD shows the hull value (`76 / 100`).
 - UI-3: arena framing: the sea continues past the arena (darker) instead of empty bars, and a bright foam line marks the playable edge; slimmer HUD row on short landscape screens (phone HUD 71 px -> 50 px, arena ~7% taller). The HUD is deliberately NOT overlaid on the arena (reference art does), because the challenge requires no cropping of arena or HUD.
+- UI-4: sound from the asset pack: cannon fire (front vs broadside), hits, splashes, ramming, explosions, sinking, score, low-hull and 10 s warnings, start/pause/resume/end stings, ocean ambience and a sailing loop that follows the ship speed. HUD speaker button and `M` key toggle sound (remembered across visits; listed in the controls legend). Audio never blocks the game: every failure is silent, loops fade while paused.
 
 ### Changed
+- `PW_SLOW=1` Playwright mode for busy or low-end machines (1 worker, 3x timeouts).
+- Menu visual regression also captures the bottom of the menu (the menu scrolls inside `.scene`, so `fullPage` only covered the first screen).
 - HUD heart icon now sits centred beside the health bar (a CSS specificity bug pushed it up and clipped it on short screens).
 - Visual regression tolerance tightened from 3% of the image to 60 pixels: the old budget let a changed HUD value or bar colour pass unnoticed. Baselines regenerated and verified stable over repeated runs.
 

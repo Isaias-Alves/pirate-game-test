@@ -49,7 +49,7 @@ test.describe('Navigation and abandoning a match', () => {
 
   test('the menu shows the controls and both leaderboard tabs, and the tabs work from the keyboard', async ({ page }) => {
     await openMenu(page);
-    for (const key of ['W', 'A', 'D', 'Space', 'Q', 'E']) await expect(page.locator('kbd', { hasText: key }).first()).toBeVisible();
+    for (const key of ['W', 'A', 'D', 'Space', 'Q', 'E', 'M']) await expect(page.locator('kbd', { hasText: key }).first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Controls' })).toBeVisible();
 
     const ranking = page.getByRole('tab', { name: 'Ranking' });

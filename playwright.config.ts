@@ -1,6 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4174;
+/**
+ * `PW_SLOW=1` for busy or low-end machines: one worker and 3x longer timeouts. The arena renders with software
+ * WebGL in headless Chromium, which is CPU-bound, so a loaded CPU otherwise shows up as timeouts, not failures.
+ */
+const SLOW = process.env.PW_SLOW === '1' ? 3 : 1;
 
 /**
  * End-to-end + visual regression. Tests run against an optimized build made with `--mode e2e`
@@ -13,10 +18,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   // The arena renders with software WebGL in headless Chromium, so extra workers only slow each other down.
-  workers: 2,
-  timeout: 45_000,
+  workers: SLOW > 1 ? 1 : 2,
+  timeout: 45_000 * SLOW,
   expect: {
-    timeout: 8_000,
+    timeout: 8_000 * SLOW,
     // Tight on purpose: a changed HUD value or bar colour must fail. Rendering is deterministic (seeded sim, manual clock,
     // reduced motion), so the budget only absorbs anti-aliasing noise.
     toHaveScreenshot: { maxDiffPixels: 60, animations: 'disabled' },

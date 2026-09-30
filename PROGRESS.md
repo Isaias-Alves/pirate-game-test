@@ -75,3 +75,9 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 - Visual tolerance is `maxDiffPixels: 60`: any intended visual change requires regenerating AND inspecting baselines.
 - The built-in browser pane counts as a hidden tab → the game auto-pauses there; use `?clock=manual&gameSeed=1` and `window.__game.advance(s)` for manual checks.
 - Full suite takes ~17 min with 2 workers; run it in the background.
+
+## ▶ Resumed 2026-09-30 — UI-4 finished
+- Match-screen baselines regenerated and inspected (HUD sound button); menu/options unchanged. Found and fixed a coverage gap: the menu scrolls inside `.scene`, so `fullPage` only captured the first 720 px; added `menu-bottom.png`.
+- Compliance fix: the new `M` (sound) key was missing from the on-screen controls legend ("Apresente os comandos na interface") and README; added.
+- Machine was at ~91% CPU from other apps (game launcher, chat, VTT): e2e timed out. Added `PW_SLOW=1` (1 worker, 3x timeouts), documented in README. Full suite under PW_SLOW: 164/164 in 43 min.
+- Next: UI-5 (ranking setup picker) and UI-6 (rank on result) are written (stash "ui-5+ui-6" → popped after this commit) and need their e2e regression, then UI-7, UI-8; deploy + committed test report still pending.

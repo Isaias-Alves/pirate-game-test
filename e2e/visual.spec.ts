@@ -10,6 +10,12 @@ test.describe('Visual regression', () => {
     await openMenu(page);
     await expect(page.getByTestId('ranking-row').first()).toBeVisible();
     await expect(page).toHaveScreenshot('menu.png', { fullPage: true });
+    // The menu scrolls inside `.scene` (not the document), so `fullPage` only sees the first screen:
+    // capture the bottom too (end of the controls legend, network simulation panel).
+    await page.locator('.scene').evaluate((el) => {
+      el.scrollTo(0, el.scrollHeight);
+    });
+    await expect(page).toHaveScreenshot('menu-bottom.png');
   });
 
   test('arena in a stable state', async ({ page }) => {

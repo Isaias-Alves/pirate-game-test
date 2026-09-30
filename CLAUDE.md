@@ -114,7 +114,7 @@ Uma de cada vez, cada uma com commit próprio e testes de regressão (lint + typ
 
 - [x] UI-1 — fogo nos navios danificados (sprites `fire_1`/`fire_2`, já carregados e sem uso). Enunciado: reforça "deterioração visual dos navios conforme a vida restante"; manter pequeno para não prejudicar a "leitura da arena".
 - [x] UI-2 — legibilidade da vida: barras dos inimigos vermelhas, do jogador verdes (âmbar/vermelho quando baixa) e "76 / 100" no HUD. Enunciado: "Exiba vida acima do navio do jogador e de cada inimigo" continua atendido.
-- [ ] UI-3 — moldura da arena: preencher as faixas escuras (letterbox) com mar escurecido + borda de limite clara, e HUD mais compacto em telas baixas. **Não** sobrepor o HUD à arena como na imagem de referência: o enunciado exige "sem cortes na arena ou no HUD".
+- [x] UI-3 — moldura da arena: preencher as faixas escuras (letterbox) com mar escurecido + borda de limite clara, e HUD mais compacto em telas baixas. **Não** sobrepor o HUD à arena como na imagem de referência: o enunciado exige "sem cortes na arena ou no HUD".
 - [ ] UI-4 — sons (assets/sounds) + botão de mudo persistido, pausando junto com o jogo e só iniciando após gesto do usuário. Enunciado: permitido ("recursos complementares"); console sem erros (autoplay).
 - [ ] UI-5 — ranking: seletor de configuração (padrão = opções atuais). Enunciado: continua comparando só partidas com a mesma configuração.
 - [ ] UI-6 — resultado: mostrar a posição no ranking depois que a partida for registrada. Enunciado: resultado continua com pontuação, tempo, motivo, situação do registro e as duas ações.

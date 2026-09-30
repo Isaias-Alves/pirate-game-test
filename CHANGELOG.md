@@ -7,8 +7,10 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 ### Added
 - UI-1: fires break out on heavily damaged ships (one flame) and wrecks (two flames), using the pack's `fire_1`/`fire_2` sprites; they flicker on wall time, freeze while paused and stay still with prefers-reduced-motion. New visual baseline `arena-damaged`.
 - UI-2: health at a glance: enemy bars are always red, the player's bar is green (red when low), and the HUD shows the hull value (`76 / 100`).
+- UI-3: arena framing: the sea continues past the arena (darker) instead of empty bars, and a bright foam line marks the playable edge; slimmer HUD row on short landscape screens (phone HUD 71 px -> 50 px, arena ~7% taller). The HUD is deliberately NOT overlaid on the arena (reference art does), because the challenge requires no cropping of arena or HUD.
 
 ### Changed
+- HUD heart icon now sits centred beside the health bar (a CSS specificity bug pushed it up and clipped it on short screens).
 - Visual regression tolerance tightened from 3% of the image to 60 pixels: the old budget let a changed HUD value or bar colour pass unnoticed. Baselines regenerated and verified stable over repeated runs.
 
 UI improvement track, built on top of 1.0.0. Every item is checked against [CHALLENGE.md](CHALLENGE.md) before it is built and ships with regression tests; progress is tracked in [CLAUDE.md](CLAUDE.md) ("Melhorias de interface") and [PROGRESS.md](PROGRESS.md).

@@ -1,4 +1,4 @@
-import { Container, Sprite, TilingSprite, type Application, type Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, TilingSprite, type Application, type Texture } from 'pixi.js';
 import { SHIP_ART_FORWARD, type GameTextures, type ShipColor } from '../assets';
 import type { Simulation } from '../sim/Simulation';
 import { PLAYER_ID, type SimEvent } from '../sim/types';
@@ -15,6 +15,13 @@ const SHAKE_SIZE = 5;
 const reducedMotion = (): boolean => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 /** Health bars float this far above the ship's centre, beyond its radius. */
 const BAR_GAP = 20;
+/**
+ * The sea continues past the arena so the screen never shows empty bars, but darker, behind a bright shoreline
+ * of foam: the playable area stays unmistakable (ships are clamped to it).
+ */
+const OUTER_SEA_TINT = 0x33566b;
+const EDGE_SHADOW = { width: 10, color: 0x04121b, alpha: 0.35 } as const;
+const EDGE_FOAM = { width: 3, color: 0xe8f8ff, alpha: 0.75 } as const;
 /** Deck spots (ship-art pixels; the art faces +y) where fires break out as damage grows. */
 const FLAME_SPOTS = [
   { x: -9, y: 10 },
@@ -126,6 +133,8 @@ export class Renderer {
   private shake = 0;
   private readonly calm = reducedMotion();
   private readonly shakeSize = this.calm ? 0 : SHAKE_SIZE;
+  /** Screen-space sea outside the arena (the letterbox area). */
+  private readonly outerSea: TilingSprite;
   private baseX = 0;
   private baseY = 0;
 
@@ -136,6 +145,10 @@ export class Renderer {
   ) {
     this.textures = textures;
     const { width, height } = sim.config.arena;
+
+    this.outerSea = new TilingSprite({ texture: textures.water, width: 1, height: 1 });
+    this.outerSea.tint = OUTER_SEA_TINT;
+    app.stage.addChild(this.outerSea);
 
     const water = new TilingSprite({ texture: textures.water, width, height });
     this.world.addChild(water);
@@ -149,6 +162,13 @@ export class Renderer {
       s.position.set(island.x, island.y);
       this.world.addChild(s);
     }
+
+    const edge = new Graphics()
+      .rect(-EDGE_SHADOW.width / 2, -EDGE_SHADOW.width / 2, width + EDGE_SHADOW.width, height + EDGE_SHADOW.width)
+      .stroke(EDGE_SHADOW)
+      .rect(0, 0, width, height)
+      .stroke(EDGE_FOAM);
+    this.world.addChild(edge);
 
     this.world.addChild(this.shipLayer, this.fireLayer, this.ballLayer);
     this.effects = new Effects(this.world, textures);
@@ -184,6 +204,11 @@ export class Renderer {
     this.baseX = (this.app.screen.width - width * scale) / 2;
     this.baseY = (this.app.screen.height - height * scale) / 2;
     this.world.position.set(this.baseX, this.baseY);
+    // Same tile size and origin as the arena water, so the pattern runs on seamlessly past the edge.
+    this.outerSea.width = this.app.screen.width;
+    this.outerSea.height = this.app.screen.height;
+    this.outerSea.tileScale.set(scale);
+    this.outerSea.tilePosition.set(this.baseX, this.baseY);
   };
 
   /** Turns simulation events into effects. Call once per frame with the drained events. */
@@ -268,6 +293,8 @@ export class Renderer {
   destroy(): void {
     this.app.renderer.off('resize', this.layout);
     this.app.stage.removeChild(this.world);
+    this.app.stage.removeChild(this.outerSea);
+    this.outerSea.destroy();
     // Textures are shared/cached by the asset loader, so only the display objects are destroyed here.
     this.world.destroy({ children: true });
     this.enemyViews.clear();

@@ -56,6 +56,14 @@ test.describe('Visual regression', () => {
     await makeDurable(page);
     await advance(page, 61);
     await expect(page.getByTestId('record-status')).toHaveAttribute('data-state', 'confirmed');
+    // The durable hull was only needed to reach the timer; show a realistic value in the frozen HUD.
+    await page.evaluate(() => {
+      const g = window.__game;
+      if (!g) return;
+      g.sim.player.maxHealth = 100;
+      g.sim.player.health = 64;
+    });
+    await expect(page.getByTestId('health')).toHaveText('64 / 100');
     await page.waitForTimeout(1500); // explosion/shake effects triggered during the fast-forward are over
     await expect(page.getByTestId('screen-match')).toHaveScreenshot('result.png');
   });

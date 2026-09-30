@@ -747,3 +747,28 @@
     height: 50px;
   }
 }
+
+/* ---------- Ranking setup picker ---------- */
+.board__setup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 0 10px;
+}
+
+.board__setup label {
+  font: 400 17px / 1.2 var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.board__select {
+  flex: 1 1 220px;
+  max-width: 360px;
+  padding: 6px 10px;
+  border: 2px solid var(--wood-500);
+  border-radius: 10px;
+  background: var(--navy-950);
+  color: var(--cream);
+  font: 600 15px / 1.2 var(--font-body);
+}

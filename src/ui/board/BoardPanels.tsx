@@ -5,6 +5,7 @@ import { useHistory, useRanking } from '../../api/hooks';
 import { loadOptions } from '../../storage/options';
 import { getPlayer } from '../../storage/player';
 import { END_REASON_TEXT, formatClock, formatDate } from '../format';
+import { describeSetup, rankingSetups } from './setups';
 
 interface QueryLike<T> {
   data: Page<T> | undefined;
@@ -135,17 +136,50 @@ function clampPage(page: number, query: { data: Page<unknown> | undefined; isPla
 
 const settingsText = (s: MatchSettings) => `${String(s.sessionSeconds)} s session · enemy every ${String(s.spawnInterval)} s`;
 
+/** Ranking tab: pick a setup (default: the player's own), then a paged table for that setup only. */
 export function RankingPanel() {
-  const settings = useCurrentSettings();
+  const current = useCurrentSettings();
+  const [setups] = useState(() => rankingSetups(current));
+  const [setupIndex, setSetupIndex] = useState(0);
+  const selectId = useId();
+  const chosen = setups[setupIndex] ?? setups[0];
+  if (!chosen) return null;
+  return (
+    <div data-testid="ranking-panel">
+      <div className="board__setup">
+        <label htmlFor={selectId}>Setup</label>
+        <select
+          id={selectId}
+          className="board__select"
+          value={setupIndex}
+          data-testid="ranking-setup"
+          onChange={(e) => {
+            setSetupIndex(Number(e.target.value));
+          }}
+        >
+          {setups.map((s, i) => (
+            <option key={s.id} value={i}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      {/* Keyed by setup, so paging restarts at page 1 for every setup. */}
+      <RankingList key={chosen.id} settings={chosen.settings} />
+    </div>
+  );
+}
+
+function RankingList({ settings }: { settings: MatchSettings }) {
   const [page, setPage] = useState(1);
   const query = useRanking(settings, page);
   clampPage(page, query, setPage);
   const me = getPlayer().id;
   const captionId = useId();
   return (
-    <div data-testid="ranking-panel">
-      <p className="board__note" id={captionId}>
-        Best matches with your current setup: <strong>{settingsText(settings)}</strong>. Change it in Options to compare other setups.
+    <>
+      <p className="board__note" id={captionId} data-testid="ranking-note">
+        Best matches played with <strong>{describeSetup(settings)}</strong>. Only matches with the same setup are compared.
       </p>
       <ListShell query={query} page={page} onPage={setPage} what="the ranking" emptyText="No matches recorded for this setup yet. Be the first!">
         {(items) => (
@@ -183,7 +217,7 @@ export function RankingPanel() {
           </table>
         )}
       </ListShell>
-    </div>
+    </>
   );
 }
 

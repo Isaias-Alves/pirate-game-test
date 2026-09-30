@@ -13,7 +13,18 @@ export function RecordStatus({ matchId }: { matchId: string }) {
   if (entry.status === 'confirmed') {
     return (
       <div className="record record--ok" role="status" data-testid="record-status" data-state="confirmed">
-        <p>Match recorded in the ranking and your history.</p>
+        <p>
+          Match recorded in the ranking and your history.
+          {entry.rank && entry.rank.position > 0 && (
+            <>
+              {' '}
+              <strong data-testid="record-rank">
+                #{entry.rank.position} of {entry.rank.of}
+              </strong>{' '}
+              for this setup.
+            </>
+          )}
+        </p>
       </div>
     );
   }

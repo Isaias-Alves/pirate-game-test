@@ -140,7 +140,7 @@ export const handlers = [
     // The match is stored, but the reply is lost: the client must retry and get the same record back.
     if (plan.scenario === 'submit-timeout') plan.hang = true;
 
-    const payload: SubmitResponse = { record: result.record, created: result.created, revision: db.revision };
+    const payload: SubmitResponse = { record: result.record, created: result.created, revision: db.revision, ...db.rankOf(result.record, viewFor(plan.scenario)) };
     return (await settle(plan)) ?? HttpResponse.json(payload, { status: result.created ? 201 : 200 });
   }),
 ];

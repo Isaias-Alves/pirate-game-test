@@ -94,6 +94,7 @@ There is no real backend. `GET /api/ranking`, `GET /api/players/:id/matches` and
 
 - The ranking compares only matches that used the **same settings**. It opens on your current Options; the **Setup** picker above the table browses other setups (Quick, Standard, Marathon, Swarm, Calm). Ordered by score, then a full-time finish over a sinking, then the earlier match, then match id (a total, deterministic order). Other players are deterministic fixtures.
 - A finished match is stored locally **before** it is sent. It carries a client-generated `matchId`; the mock server treats it as an idempotency key, so retries, double clicks, timeouts after saving and reloads never create a second record.
+- Once recorded, the result screen shows the match position in the ranking for its setup (e.g. `#12 of 35`).
 - If sending fails the result screen says so and offers **Try again**; the main menu shows a banner (**Send now**) while anything is unrecorded. You can start another match meanwhile.
 - List failures never block the game, the options or a running match.
 

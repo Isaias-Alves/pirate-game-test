@@ -9,6 +9,8 @@ export interface Submission {
   status: SubmissionStatus;
   /** User-facing reason for the last failure. */
   error?: string;
+  /** Ranking position reported by the server once the match is recorded. */
+  rank?: { position: number; of: number };
 }
 
 export interface SubmissionsApi {

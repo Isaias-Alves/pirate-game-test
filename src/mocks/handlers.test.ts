@@ -42,6 +42,10 @@ describe('mock API contract', () => {
     const again = await submitMatch(rec());
     expect(first.created).toBe(true);
     expect(again.created).toBe(false);
+    // The reply says where the match landed in the ranking for its setup (same answer on replay).
+    expect(first.rank).toBeGreaterThan(0);
+    expect(first.rank).toBeLessThanOrEqual(first.rankedOf);
+    expect(again.rank).toBe(first.rank);
     expect(again.record.matchId).toBe('api-1');
     expect(db.confirmed).toHaveLength(1);
     const history = await fetchHistory({ playerId: 'p-test', page: 1 });

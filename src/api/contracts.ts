@@ -4,7 +4,7 @@
  *
  *   GET  /api/ranking?sessionSeconds&spawnInterval&page&pageSize   -> Page<RankingEntry>
  *   GET  /api/players/:playerId/matches?page&pageSize              -> Page<MatchRecord>
- *   POST /api/matches   (body: MatchRecord)                        -> 201 Created | 200 already recorded
+ *   POST /api/matches   (body: MatchRecord)                        -> 201 Created | 200 already recorded (+ rank)
  */
 
 export type EndReason = 'time' | 'death';
@@ -52,6 +52,9 @@ export interface SubmitResponse {
   /** True when this call created the record, false when it already existed (idempotent replay). */
   created: boolean;
   revision: number;
+  /** 1-based position of this match in the ranking for its setup, and how many matches that ranking holds. */
+  rank: number;
+  rankedOf: number;
 }
 
 export interface ApiErrorBody {

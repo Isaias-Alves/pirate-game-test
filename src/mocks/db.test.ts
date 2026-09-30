@@ -124,6 +124,19 @@ describe('ranking', () => {
   });
 });
 
+describe('rankOf', () => {
+  it('reports the position among matches with the same settings', () => {
+    const db = new MockDb(memoryStorage());
+    const top = rec({ matchId: 'top', score: 999 });
+    const bottom = rec({ matchId: 'bottom', score: 0, endReason: 'death' });
+    db.submit(top);
+    db.submit(bottom);
+    const total = db.ranking(SETTINGS, 1, 1, view).total;
+    expect(db.rankOf(top, view)).toEqual({ rank: 1, rankedOf: total });
+    expect(db.rankOf(bottom, view)).toEqual({ rank: total, rankedOf: total });
+  });
+});
+
 describe('history', () => {
   it('lists only the given player, newest first', () => {
     const db = new MockDb(memoryStorage());

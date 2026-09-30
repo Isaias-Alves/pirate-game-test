@@ -117,7 +117,7 @@ Uma de cada vez, cada uma com commit próprio e testes de regressão (lint + typ
 - [x] UI-3 — moldura da arena: preencher as faixas escuras (letterbox) com mar escurecido + borda de limite clara, e HUD mais compacto em telas baixas. **Não** sobrepor o HUD à arena como na imagem de referência: o enunciado exige "sem cortes na arena ou no HUD".
 - [x] UI-4 — sons (assets/sounds) + botão de mudo persistido, pausando junto com o jogo e só iniciando após gesto do usuário. Enunciado: permitido ("recursos complementares"); console sem erros (autoplay).
 - [x] UI-5 — ranking: seletor de configuração (padrão = opções atuais). Enunciado: continua comparando só partidas com a mesma configuração.
-- [ ] UI-6 — resultado: mostrar a posição no ranking depois que a partida for registrada. Enunciado: resultado continua com pontuação, tempo, motivo, situação do registro e as duas ações.
+- [x] UI-6 — resultado: mostrar a posição no ranking depois que a partida for registrada. Enunciado: resultado continua com pontuação, tempo, motivo, situação do registro e as duas ações.
 - [ ] UI-7 — feedback de rede nas listas: mostrar tentativas ("retrying 1/2") e timeout padrão menor. Enunciado: "Gerencie carregamento, vazio, erro, atualização em segundo plano… e retries".
 - [ ] UI-8 — polimento: lembrete de controles no diálogo de pausa, favicon, rótulo acessível no canvas, aviso de "gire o aparelho" sem quebra. Enunciado: "Apresente os comandos na interface".
 

@@ -95,9 +95,20 @@ export class MockDb {
     return [...fixturesFor(settings), ...(view.extraFixtures ? extraFixturesFor(settings) : [])];
   }
 
-  ranking(settings: MatchSettings, page: number, pageSize: number, view: DataView): Page<RankingEntry> {
+  /** Every match with exactly these settings, in ranking order. */
+  private ranked(settings: MatchSettings, view: DataView): MatchRecord[] {
     const pool = [...this.standing(settings, view), ...this.state.matches].filter((m) => sameSettings(m.settings, settings));
-    pool.sort(compareRanking);
+    return pool.sort(compareRanking);
+  }
+
+  /** Where a recorded match stands among matches with the same settings. */
+  rankOf(record: MatchRecord, view: DataView): { rank: number; rankedOf: number } {
+    const pool = this.ranked(record.settings, view);
+    return { rank: pool.findIndex((m) => m.matchId === record.matchId) + 1, rankedOf: pool.length };
+  }
+
+  ranking(settings: MatchSettings, page: number, pageSize: number, view: DataView): Page<RankingEntry> {
+    const pool = this.ranked(settings, view);
     const ranked: RankingEntry[] = pool.map((m, i) => ({ ...m, rank: i + 1 }));
     return paginate(ranked, page, pageSize, this.state.revision);
   }

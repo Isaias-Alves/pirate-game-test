@@ -53,7 +53,7 @@ export async function fetchHistory({ playerId, page, pageSize }: HistoryParams, 
 /** Idempotent: re-sending the same `matchId` returns the existing record instead of creating another. */
 export async function submitMatch(record: MatchRecord): Promise<SubmitResponse> {
   const { data } = await http.post<unknown>('/matches', record);
-  if (typeof data !== 'object' || data === null || !('record' in data) || !('created' in data)) {
+  if (typeof data !== 'object' || data === null || !('record' in data) || !('created' in data) || !('rank' in data) || !('rankedOf' in data)) {
     throw new Error('Unexpected response from the server.');
   }
   return data as SubmitResponse;

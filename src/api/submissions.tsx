@@ -48,8 +48,8 @@ export function SubmissionProvider({ children }: { children: ReactNode }) {
       commit({ ...latest.current, [matchId]: { record: entry.record, status: 'sending' } });
 
       const job = mutateAsync(entry.record).then(
-        () => {
-          update(matchId, { status: 'confirmed' });
+        (response) => {
+          update(matchId, { status: 'confirmed', rank: { position: response.rank, of: response.rankedOf } });
           // Both lists changed: refresh whatever is cached, cancelling any older in-flight fetch.
           void queryClient.invalidateQueries({ queryKey: ['ranking'] });
           void queryClient.invalidateQueries({ queryKey: ['history'] });

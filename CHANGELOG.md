@@ -4,6 +4,9 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ## [Unreleased]
 
+### Added
+- UI-1: fires break out on heavily damaged ships (one flame) and wrecks (two flames), using the pack's `fire_1`/`fire_2` sprites; they flicker on wall time, freeze while paused and stay still with prefers-reduced-motion. New visual baseline `arena-damaged`.
+
 UI improvement track, built on top of 1.0.0. Every item is checked against [CHALLENGE.md](CHALLENGE.md) before it is built and ships with regression tests; progress is tracked in [CLAUDE.md](CLAUDE.md) ("Melhorias de interface") and [PROGRESS.md](PROGRESS.md).
 
 ## [1.0.0] — 2026-09-29

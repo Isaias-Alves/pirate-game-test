@@ -19,6 +19,22 @@ test.describe('Visual regression', () => {
     await expect(page.getByTestId('screen-match')).toHaveScreenshot('arena.png');
   });
 
+  test('damaged ships: damage-stage art, fire on deck and low health bars', async ({ page }) => {
+    await startMatch(page, { gameSeed: 1 });
+    await advance(page, 4);
+    // Instrumentation: set hull values directly so the scene is exactly the same on every run.
+    await page.evaluate(() => {
+      const g = window.__game;
+      if (!g) return;
+      g.sim.player.health = 20; // wreck stage: two fires, red bar
+      const chaser = g.sim.enemies[0];
+      if (chaser) chaser.health = chaser.maxHealth * 0.45; // heavy damage: one fire
+    });
+    await advance(page, 0.05);
+    await page.waitForTimeout(600);
+    await expect(page.getByTestId('screen-match')).toHaveScreenshot('arena-damaged.png');
+  });
+
   test('arena with touch controls', async ({ page }) => {
     await startMatch(page, { gameSeed: 1, touch: true });
     await advance(page, 4);

@@ -112,7 +112,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 
 Uma de cada vez, cada uma com commit próprio e testes de regressão (lint + typecheck + unit + specs e2e afetados + regressão visual; suíte completa nos checkpoints). Antes de cada uma, conferir contra o `CHALLENGE.md`.
 
-- [ ] UI-1 — fogo nos navios danificados (sprites `fire_1`/`fire_2`, já carregados e sem uso). Enunciado: reforça "deterioração visual dos navios conforme a vida restante"; manter pequeno para não prejudicar a "leitura da arena".
+- [x] UI-1 — fogo nos navios danificados (sprites `fire_1`/`fire_2`, já carregados e sem uso). Enunciado: reforça "deterioração visual dos navios conforme a vida restante"; manter pequeno para não prejudicar a "leitura da arena".
 - [ ] UI-2 — legibilidade da vida: barras dos inimigos vermelhas, do jogador verdes (âmbar/vermelho quando baixa) e "76 / 100" no HUD. Enunciado: "Exiba vida acima do navio do jogador e de cada inimigo" continua atendido.
 - [ ] UI-3 — moldura da arena: preencher as faixas escuras (letterbox) com mar escurecido + borda de limite clara, e HUD mais compacto em telas baixas. **Não** sobrepor o HUD à arena como na imagem de referência: o enunciado exige "sem cortes na arena ou no HUD".
 - [ ] UI-4 — sons (assets/sounds) + botão de mudo persistido, pausando junto com o jogo e só iniciando após gesto do usuário. Enunciado: permitido ("recursos complementares"); console sem erros (autoplay).

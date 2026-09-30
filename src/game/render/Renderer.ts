@@ -2,6 +2,7 @@ import { Container, Sprite, TilingSprite, type Application, type Texture } from 
 import { SHIP_ART_FORWARD, type GameTextures, type ShipColor } from '../assets';
 import type { Simulation } from '../sim/Simulation';
 import { PLAYER_ID, type SimEvent } from '../sim/types';
+import { damageStage, flameCount, type DamageStage } from './damage';
 import { Effects } from './Effects';
 import { HealthBar } from './HealthBar';
 
@@ -10,26 +11,51 @@ const HIT_FLASH = 0.16;
 /** Camera shake when the player is hit: duration (s) and max offset (world units). */
 const SHAKE_TIME = 0.22;
 const SHAKE_SIZE = 5;
-/** Players who ask the OS for less motion get no camera shake (hits still flash and show impact effects). */
+/** Players who ask the OS for less motion get no camera shake and no flame flicker (hits still flash and show impacts). */
 const reducedMotion = (): boolean => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 /** Health bars float this far above the ship's centre, beyond its radius. */
 const BAR_GAP = 20;
+/** Deck spots (ship-art pixels; the art faces +y) where fires break out as damage grows. */
+const FLAME_SPOTS = [
+  { x: -9, y: 10 },
+  { x: 10, y: -14 },
+] as const;
+/** Flame frame swaps per second, and flame size relative to the art. */
+const FLAME_FPS = 9;
+const FLAME_SCALE = 1.05;
 
-/** Sprite + health bar for one ship. Sprite art swaps as health drops; a red tint flashes on hits. */
+/**
+ * Sprite + health bar for one ship. Sprite art swaps as health drops, fires break out on heavily damaged
+ * hulls, and a red tint flashes on hits.
+ */
 class ShipView {
   readonly sprite: Sprite;
   readonly bar: HealthBar;
-  private stage = -1;
+  private readonly flames: Sprite[];
+  private stage: DamageStage | -1 = -1;
   private flash = 0;
+  private flicker = 0;
 
   constructor(
     private readonly art: Texture[],
     private readonly thresholds: readonly [number, number, number],
     healthArt: GameTextures['healthBar'],
+    private readonly fireArt: Texture[],
+    fireLayer: Container,
+    /** False with prefers-reduced-motion: flames are drawn but do not flicker. */
+    private readonly animate: boolean,
   ) {
     this.sprite = new Sprite(art[0]);
     this.sprite.anchor.set(0.5);
     this.bar = new HealthBar(healthArt);
+    this.flames = FLAME_SPOTS.map(() => {
+      const flame = new Sprite(fireArt[0]);
+      flame.anchor.set(0.5, 0.85);
+      flame.scale.set(FLAME_SCALE);
+      flame.visible = false;
+      fireLayer.addChild(flame);
+      return flame;
+    });
   }
 
   hit(): void {
@@ -40,8 +66,7 @@ class ShipView {
     this.sprite.position.set(x, y);
     this.sprite.rotation = angle - SHIP_ART_FORWARD;
 
-    const [a, b, c] = this.thresholds;
-    const stage = healthFraction > a ? 0 : healthFraction > b ? 1 : healthFraction > c ? 2 : 3;
+    const stage = damageStage(healthFraction, this.thresholds);
     if (stage !== this.stage) {
       this.stage = stage;
       const tex = this.art[stage];
@@ -53,11 +78,30 @@ class ShipView {
 
     this.bar.view.position.set(x, y - radius - BAR_GAP);
     this.bar.set(healthFraction);
+    this.updateFlames(x, y, stage, dt);
+  }
+
+  /** Flames stay upright on screen and ride on the hull; they flicker on wall time and freeze with dt = 0. */
+  private updateFlames(x: number, y: number, stage: DamageStage, dt: number): void {
+    const lit = flameCount(stage);
+    if (this.animate) this.flicker += dt;
+    const cos = Math.cos(this.sprite.rotation);
+    const sin = Math.sin(this.sprite.rotation);
+    this.flames.forEach((flame, i) => {
+      const spot = FLAME_SPOTS[i];
+      flame.visible = i < lit && spot !== undefined;
+      if (!flame.visible || !spot) return;
+      flame.position.set(x + spot.x * cos - spot.y * sin, y + spot.x * sin + spot.y * cos);
+      const frame = this.fireArt[(Math.floor(this.flicker * FLAME_FPS) + i) % this.fireArt.length];
+      if (frame) flame.texture = frame;
+      flame.scale.set(FLAME_SCALE, this.animate ? FLAME_SCALE * (0.9 + 0.12 * Math.sin((this.flicker + i) * 13)) : FLAME_SCALE);
+    });
   }
 
   destroy(): void {
     this.sprite.destroy();
     this.bar.destroy();
+    for (const flame of this.flames) flame.destroy();
   }
 }
 
@@ -68,6 +112,7 @@ class ShipView {
 export class Renderer {
   private readonly world = new Container();
   private readonly shipLayer = new Container();
+  private readonly fireLayer = new Container();
   private readonly ballLayer = new Container();
   private readonly barLayer = new Container();
   private readonly effects: Effects;
@@ -78,7 +123,8 @@ export class Renderer {
   /** Sprite pool for cannonballs: grown on demand, hidden when unused, destroyed with the world. */
   private readonly ballPool: Sprite[] = [];
   private shake = 0;
-  private readonly shakeSize = reducedMotion() ? 0 : SHAKE_SIZE;
+  private readonly calm = reducedMotion();
+  private readonly shakeSize = this.calm ? 0 : SHAKE_SIZE;
   private baseX = 0;
   private baseY = 0;
 
@@ -103,7 +149,7 @@ export class Renderer {
       this.world.addChild(s);
     }
 
-    this.world.addChild(this.shipLayer, this.ballLayer);
+    this.world.addChild(this.shipLayer, this.fireLayer, this.ballLayer);
     this.effects = new Effects(this.world, textures);
     this.world.addChild(this.barLayer);
 
@@ -115,7 +161,14 @@ export class Renderer {
   }
 
   private makeShip(color: ShipColor): ShipView {
-    const view = new ShipView(this.textures.ships[color], this.sim.config.feedback.damageStageThresholds, this.textures.healthBar);
+    const view = new ShipView(
+      this.textures.ships[color],
+      this.sim.config.feedback.damageStageThresholds,
+      this.textures.healthBar,
+      this.textures.fire,
+      this.fireLayer,
+      !this.calm,
+    );
     this.shipLayer.addChild(view.sprite);
     this.barLayer.addChild(view.bar.view);
     return view;

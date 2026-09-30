@@ -64,4 +64,13 @@ test.describe('Asset loading', () => {
     await expect(page.getByTestId('screen-menu')).toBeVisible();
     await expect(page.locator('canvas')).toHaveCount(0);
   });
+
+  test('the page ships a working favicon', async ({ page }) => {
+    await openMenu(page);
+    const href = await page.locator('link[rel="icon"]').getAttribute('href');
+    expect(href).toBeTruthy();
+    const res = await page.request.get(new URL(href ?? '', page.url()).href);
+    expect(res.ok()).toBe(true);
+    expect(res.headers()['content-type']).toContain('image/png');
+  });
 });

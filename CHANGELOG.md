@@ -12,6 +12,7 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 - UI-5: ranking **Setup** picker: opens on the player setup, can browse other setups; paging restarts per setup. Each table still compares only matches with identical settings.
 - UI-6: the result screen shows the ranking position once the match is recorded (`#12 of 35 for this setup`). `POST /api/matches` replies now include `rank` and `rankedOf` (same on idempotent replays).
 - UI-7: lists say when a request is being retried (`Loading the ranking… No answer yet, trying again (attempt 2 of 3).`, and `updating… (retrying)` on background refreshes).
+- UI-8: the pause dialog has a collapsible controls reminder (reachable by keyboard; the focus trap now includes `<summary>`), the arena host has an accessible name (`role="img"`, "Battle arena"), a favicon (the player ship), a meta description and theme colour; the portrait "rotate" hint never wraps.
 
 ### Changed
 

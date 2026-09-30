@@ -85,6 +85,10 @@
   background: rgb(4 14 22 / 0.8);
   color: #fdf1d3;
   font: 600 12px 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   pointer-events: none;
   z-index: 6;
 }

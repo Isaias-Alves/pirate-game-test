@@ -325,6 +325,23 @@
   color: var(--cream-dim);
 }
 
+.pause__controls {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.pause__controls summary {
+  cursor: pointer;
+  color: var(--cream-dim);
+  text-decoration: underline;
+}
+
+.pause__controls .controls__list {
+  margin-top: 8px;
+  gap: 4px;
+  text-align: left;
+}
+
 .pause__actions,
 .result__actions {
   display: flex;

@@ -106,4 +106,24 @@ test.describe('Pause', () => {
     expect(s.player.y).toBeCloseTo(620, 0);
     expect(s.player.health).toBe(s.player.maxHealth);
   });
+
+  test('the pause dialog carries a keyboard-reachable controls reminder', async ({ page }) => {
+    await startMatch(page, REAL);
+    // The arena has an accessible name even though the canvas itself is not readable.
+    await expect(page.getByRole('img', { name: 'Battle arena' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    const dialog = page.getByRole('dialog', { name: 'Paused' });
+    const reminder = dialog.getByTestId('pause-controls');
+    await expect(reminder).not.toHaveAttribute('open'); // collapsed, so the dialog stays short
+    // Tab order stays inside the dialog and reaches the reminder.
+    const summary = reminder.locator('summary');
+    for (let i = 0; i < 4 && !(await summary.evaluate((el) => el === document.activeElement)); i++) await page.keyboard.press('Tab');
+    await expect(summary).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(reminder).toHaveAttribute('open');
+    await expect(reminder).toContainText('Fire left broadside');
+    await expect(reminder.locator('kbd', { hasText: 'Q' })).toBeVisible();
+    // Still paused: reading the reminder does not resume the match.
+    await expect(dialog).toBeVisible();
+  });
 });

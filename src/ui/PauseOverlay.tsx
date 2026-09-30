@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import type { Game } from '../game/Game';
 import { Dialog } from './Dialog';
+import { ControlsList } from './screens/ControlsLegend';
 import { useClickGuard } from './useClickGuard';
 import { useMatch } from './useMatch';
 
@@ -46,6 +47,10 @@ function PauseDialog({ game, focusCause, onRestart, onExit }: PauseOverlayProps 
           Main Menu
         </button>
       </div>
+      <details className="pause__controls" data-testid="pause-controls">
+        <summary>Controls</summary>
+        <ControlsList />
+      </details>
       <p className="overlay__hint">Esc or P also resumes. Leaving abandons this match — it will not be recorded.</p>
     </Dialog>
   );

@@ -142,7 +142,7 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
       <h1 className="sr-only">Battle</h1>
       {game ? <Hud game={game} /> : <div />}
       <div className="match__arena">
-        <div ref={hostRef} style={{ position: 'absolute', inset: 0 }} />
+        <div ref={hostRef} role="img" aria-label="Battle arena" style={{ position: 'absolute', inset: 0 }} />
         {status === 'loading' && (
           <div className="match__loading" role="status" data-testid="loading">
             <p>Loading the seas…</p>

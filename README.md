@@ -65,7 +65,7 @@ Visual baselines live in `e2e/__screenshots__/`; refresh them with `npx playwrig
 
 Everything can be held at the same time (sail, turn and fire). Touch buttons track their own finger, so several can be held together. The game pauses by itself when the window loses focus or the tab is hidden, and resuming always needs a click or key press. On phones, landscape gives the biggest arena (portrait works and shows a hint).
 
-Keys are only captured while a match is running; menus behave normally.
+Keys are only captured while a match is running; menus behave normally. The pause dialog repeats the key list (**Controls**).
 
 ## Rules
 

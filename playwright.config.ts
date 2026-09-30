@@ -17,7 +17,9 @@ export default defineConfig({
   timeout: 45_000,
   expect: {
     timeout: 8_000,
-    toHaveScreenshot: { maxDiffPixelRatio: 0.03, animations: 'disabled' },
+    // Tight on purpose: a changed HUD value or bar colour must fail. Rendering is deterministic (seeded sim, manual clock,
+    // reduced motion), so the budget only absorbs anti-aliasing noise.
+    toHaveScreenshot: { maxDiffPixels: 60, animations: 'disabled' },
   },
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {

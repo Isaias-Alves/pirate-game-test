@@ -57,6 +57,8 @@ test.describe('Enemies and spawning', () => {
     expect(after.player.health).toBe(gameConfig.player.maxHealth - gameConfig.chaser.contactDamage);
     expect(after.enemies.filter((e) => e.kind === 'chaser')).toHaveLength(0); // exploded on impact
     expect(after.score).toBe(0);
+    // The HUD shows the exact hull value after the impact.
+    await expect(page.getByTestId('health')).toHaveText(`${String(after.player.health)} / ${String(gameConfig.player.maxHealth)}`);
     await advance(page, 2);
     expect((await snapshot(page)).player.health).toBe(after.player.health); // one impact, one hit
   });

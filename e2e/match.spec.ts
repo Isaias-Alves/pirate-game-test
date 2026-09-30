@@ -69,6 +69,7 @@ test.describe('Match end and restart', () => {
     expect(fresh.projectiles).toHaveLength(0);
     expect(fresh.duration).toBe(90);
     await expect(page.getByTestId('time')).toHaveText('1:30');
+    await expect(page.getByTestId('health')).toHaveText('100 / 100');
     await expect(page.getByTestId('score')).toHaveText('0');
     await expect(page.locator('canvas')).toHaveCount(1);
 

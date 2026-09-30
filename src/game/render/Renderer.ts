@@ -4,7 +4,7 @@ import type { Simulation } from '../sim/Simulation';
 import { PLAYER_ID, type SimEvent } from '../sim/types';
 import { damageStage, flameCount, type DamageStage } from './damage';
 import { Effects } from './Effects';
-import { HealthBar } from './HealthBar';
+import { HealthBar, type BarSide } from './HealthBar';
 
 /** How long a ship stays tinted after being hit (seconds). */
 const HIT_FLASH = 0.16;
@@ -40,6 +40,7 @@ class ShipView {
     private readonly art: Texture[],
     private readonly thresholds: readonly [number, number, number],
     healthArt: GameTextures['healthBar'],
+    side: BarSide,
     private readonly fireArt: Texture[],
     fireLayer: Container,
     /** False with prefers-reduced-motion: flames are drawn but do not flicker. */
@@ -47,7 +48,7 @@ class ShipView {
   ) {
     this.sprite = new Sprite(art[0]);
     this.sprite.anchor.set(0.5);
-    this.bar = new HealthBar(healthArt);
+    this.bar = new HealthBar(healthArt, side);
     this.flames = FLAME_SPOTS.map(() => {
       const flame = new Sprite(fireArt[0]);
       flame.anchor.set(0.5, 0.85);
@@ -153,18 +154,19 @@ export class Renderer {
     this.effects = new Effects(this.world, textures);
     this.world.addChild(this.barLayer);
 
-    this.player = this.makeShip('blue');
+    this.player = this.makeShip('blue', 'friend');
     app.stage.addChild(this.world);
     app.renderer.on('resize', this.layout);
     this.layout();
     this.update(0);
   }
 
-  private makeShip(color: ShipColor): ShipView {
+  private makeShip(color: ShipColor, side: BarSide): ShipView {
     const view = new ShipView(
       this.textures.ships[color],
       this.sim.config.feedback.damageStageThresholds,
       this.textures.healthBar,
+      side,
       this.textures.fire,
       this.fireLayer,
       !this.calm,
@@ -230,7 +232,7 @@ export class Renderer {
       live.add(e.id);
       let view = this.enemyViews.get(e.id);
       if (!view) {
-        view = this.makeShip(e.kind === 'chaser' ? 'black' : 'red');
+        view = this.makeShip(e.kind === 'chaser' ? 'black' : 'red', 'foe');
         this.enemyViews.set(e.id, view);
       }
       view.update(e.x, e.y, e.angle, e.radius, e.health / e.maxHealth, dt);

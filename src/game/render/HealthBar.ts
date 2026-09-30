@@ -7,6 +7,9 @@ const BAR_WIDTH = 78;
 /** At or below this fraction the fill turns red (same threshold as the HUD and the screen-reader warning). */
 const RED_BELOW = gameConfig.feedback.lowHealthFraction;
 
+/** `friend` bars are green and turn red when low; `foe` bars are always red, so sides read at a glance. */
+export type BarSide = 'friend' | 'foe';
+
 /**
  * Health indicator drawn above a ship, using the frame/fill art from the UI atlas. The fill is
  * revealed left-to-right through a mask (as the atlas metadata prescribes) rather than being stretched.
@@ -19,7 +22,10 @@ export class HealthBar {
   private readonly fillRect: GameTextures['healthBar']['fillRect'];
   private fraction = -1;
 
-  constructor(art: GameTextures['healthBar']) {
+  constructor(
+    art: GameTextures['healthBar'],
+    private readonly side: BarSide,
+  ) {
     this.fillRect = art.fillRect;
     const frame = new Sprite(art.frame);
     this.green = new Sprite(art.green);
@@ -40,7 +46,7 @@ export class HealthBar {
     this.fraction = f;
     const { x, y, w, h } = this.fillRect;
     this.mask.clear().rect(x, y, w * f, h).fill(0xffffff);
-    const low = f <= RED_BELOW;
+    const low = this.side === 'foe' || f <= RED_BELOW;
     this.green.visible = !low;
     this.red.visible = low;
   }

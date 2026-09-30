@@ -28,6 +28,9 @@ function HealthMeter({ snapshot }: { snapshot: MatchSnapshot }) {
       <img className="hud-health__frame" src={uiUrl('health_frame')} alt="" draggable={false} />
       <img className="hud-health__fill" src={uiUrl(healthFillName(fraction))} alt="" draggable={false} style={{ clipPath: clip }} />
       <img className="hud-health__icon" src={uiUrl('icon_heart')} alt="" draggable={false} />
+      <span className="hud-health__value" data-testid="health">
+        {Math.ceil(Math.max(0, snapshot.health))} / {snapshot.maxHealth}
+      </span>
     </div>
   );
 }

@@ -54,6 +54,22 @@
   transform: translateY(-50%) scale(0.8);
 }
 
+/* Numeric hull value centred on the fill area (30..226 of the 256px art), like the reference HUD. */
+.hud-health__value {
+  position: absolute;
+  inset: 0 11.7% 0 11.7%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font: 700 clamp(11px, 1.6vw, 16px) / 1 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 1px 0 #1c0f05,
+    0 0 3px #1c0f05;
+  pointer-events: none;
+}
+
 .hud-counter {
   position: relative;
   width: clamp(84px, 18vw, 160px);

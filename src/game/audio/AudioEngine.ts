@@ -4,6 +4,9 @@ const urls = import.meta.glob<string>('../../../assets/sounds/*.wav', { eager: t
 
 const urlFor = (name: SoundName): string | undefined => Object.entries(urls).find(([path]) => path.endsWith(`/${name}.wav`))?.[1];
 
+/** Loop volume changes smaller than this are inaudible and are not re-scheduled. */
+const LOOP_VOLUME_STEP = 0.01;
+
 /** Decoded sounds are kept for the whole visit, so later matches start without re-downloading. */
 const buffers = new Map<SoundName, Promise<AudioBuffer | undefined>>();
 
@@ -14,7 +17,8 @@ const buffers = new Map<SoundName, Promise<AudioBuffer | undefined>>();
 export class AudioEngine {
   private readonly ctx: AudioContext | undefined;
   private readonly master: GainNode | undefined;
-  private readonly loops = new Map<SoundName, { source: AudioBufferSourceNode; gain: GainNode }>();
+  /** `target` is the last volume asked for, so an unchanged request schedules nothing. */
+  private readonly loops = new Map<SoundName, { source: AudioBufferSourceNode; gain: GainNode; target: number }>();
   private muted: boolean;
   private disposed = false;
 
@@ -76,6 +80,9 @@ export class AudioEngine {
     if (!ctx || !master) return;
     const running = this.loops.get(name);
     if (running) {
+      // Called every frame: re-scheduling an unchanged volume would add 60 automation events a second.
+      if (Math.abs(running.target - volume) < LOOP_VOLUME_STEP) return;
+      running.target = volume;
       running.gain.gain.setTargetAtTime(volume, ctx.currentTime, 0.15);
       return;
     }
@@ -85,14 +92,16 @@ export class AudioEngine {
     gain.gain.value = 0;
     gain.connect(master);
     const source = ctx.createBufferSource();
-    this.loops.set(name, { source, gain });
+    const entry = { source, gain, target: volume };
+    this.loops.set(name, entry);
     void this.buffer(name).then((buffer) => {
       if (!buffer || this.disposed || this.loops.get(name)?.source !== source) return;
       source.buffer = buffer;
       source.loop = true;
       source.connect(gain);
       source.start();
-      gain.gain.setTargetAtTime(volume, ctx.currentTime, 0.3);
+      // The volume may have changed while the file was decoding.
+      gain.gain.setTargetAtTime(entry.target, ctx.currentTime, 0.3);
     });
   }
 

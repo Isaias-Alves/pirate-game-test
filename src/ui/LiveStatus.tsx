@@ -51,7 +51,7 @@ export function LiveStatus({ game }: { game: Game }) {
       <p role="timer">Time left: {m.timeLeft} seconds</p>
       <label>
         Hull integrity
-        <meter min={0} max={m.maxHealth} low={m.maxHealth * 0.3} optimum={m.maxHealth} value={m.health}>
+        <meter min={0} max={m.maxHealth} low={m.maxHealth * gameConfig.feedback.lowHealthFraction} optimum={m.maxHealth} value={m.health}>
           {m.health} of {m.maxHealth}
         </meter>
       </label>

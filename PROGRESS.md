@@ -106,3 +106,4 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 - `0c22789` test(a11y): axe WCAG 2.1 AA spec + measured contrast over sprite art (axe marks it "incomplete" on images/gradients). Found gold buttons at 4.2–4.4:1 on short screens → `--ink-deep` #2a1606 (~4.9:1).
 - Gotcha: `getComputedStyle` is live — read values before mutating classes (first contrast run reported 1.00:1 everywhere).
 - Full suite 192/192 (26.5 min, PW_SLOW); report refreshed in `docs/test-report/`; released as v1.1.1 (tag).
+- Second review pass (bugs/bottlenecks): audio loops re-scheduled `setTargetAtTime` every frame → now only on audible change (AudioEngine.test.ts); LiveStatus meter used literal 0.3 → config. Reviewed renderer, effects, loader, store, HUD, touch, options/storage, mocks, lists, result: no other defect found. Considered and skipped: Back-button handling on mobile (leaving the page already abandons the match, as the challenge requires).

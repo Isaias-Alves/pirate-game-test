@@ -4,6 +4,10 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ## [Unreleased]
 
+### Fixed
+- The sailing and ambience loops re-scheduled their volume on every frame (60 Web Audio automation events a second even at a steady speed); a loop is now re-scheduled only when its target volume changes by an audible amount (unit test with a fake AudioContext: 121 events over 2 s before, 0 after).
+- The screen-reader hull meter used a hard-coded 0.3 for its "low" mark instead of `gameConfig.feedback.lowHealthFraction`.
+
 ## [1.1.1] — 2026-09-30
 
 Compliance audit against CHALLENGE.md after the deploy, and the fixes it produced. Full suite 192/192 (report in [docs/test-report/](docs/test-report/index.html)), unit 95/95.

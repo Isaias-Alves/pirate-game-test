@@ -1,0 +1,94 @@
+{
+  "measuredAt": "2026-09-30T00:20:33.356Z",
+  "environment": {
+    "os": "Windows_NT 10.0.26200 (x64)",
+    "cpu": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz x6",
+    "ramGB": 15.8,
+    "browser": "Chromium 153.0.8010.12 (headless)",
+    "gpuRenderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00002188) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "viewport": "1280x720 @ DPR 1",
+    "build": "optimized production build (vite build --mode e2e), served by vite preview"
+  },
+  "config": {
+    "sessionSeconds": 180,
+    "spawnInterval": 3
+  },
+  "frameStats": {
+    "wallSeconds": 12.7,
+    "simSeconds": 12.8,
+    "frames": 759,
+    "avgFps": 60,
+    "frameMs": {
+      "mean": 16.67,
+      "p50": 16.7,
+      "p95": 16.7,
+      "p99": 16.8,
+      "max": 16.8
+    },
+    "framesOver20ms": 0,
+    "framesOver33ms": 0,
+    "entities": {
+      "avg": 4.3,
+      "max": 6,
+      "maxEnemies": 3,
+      "maxProjectiles": 3
+    },
+    "endPhase": "playing",
+    "score": 0
+  },
+  "memory": {
+    "baseline": {
+      "jsHeapMB": 5.92,
+      "domNodes": 353,
+      "listeners": 175,
+      "documents": 1
+    },
+    "cycles": [
+      {
+        "cycle": 1,
+        "jsHeapMB": 7.19,
+        "domNodes": 356,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 7.81
+      },
+      {
+        "cycle": 2,
+        "jsHeapMB": 7.37,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.06
+      },
+      {
+        "cycle": 3,
+        "jsHeapMB": 7.54,
+        "domNodes": 356,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.21
+      },
+      {
+        "cycle": 4,
+        "jsHeapMB": 7.72,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.39
+      },
+      {
+        "cycle": 5,
+        "jsHeapMB": 7.84,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.54
+      }
+    ]
+  }
+}

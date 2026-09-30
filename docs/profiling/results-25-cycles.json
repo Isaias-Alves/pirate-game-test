@@ -1,0 +1,274 @@
+{
+  "measuredAt": "2026-09-30T00:25:46.588Z",
+  "environment": {
+    "os": "Windows_NT 10.0.26200 (x64)",
+    "cpu": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz x6",
+    "ramGB": 15.8,
+    "browser": "Chromium 153.0.8010.12 (headless)",
+    "gpuRenderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00002188) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "viewport": "1280x720 @ DPR 1",
+    "build": "optimized production build (vite build --mode e2e), served by vite preview"
+  },
+  "config": {
+    "sessionSeconds": 180,
+    "spawnInterval": 3
+  },
+  "frameStats": {
+    "wallSeconds": 1.8,
+    "simSeconds": 1.9,
+    "frames": 106,
+    "avgFps": 60,
+    "frameMs": {
+      "mean": 16.67,
+      "p50": 16.7,
+      "p95": 16.8,
+      "p99": 16.8,
+      "max": 16.8
+    },
+    "framesOver20ms": 0,
+    "framesOver33ms": 0,
+    "entities": {
+      "avg": 3,
+      "max": 3,
+      "maxEnemies": 0,
+      "maxProjectiles": 2
+    },
+    "endPhase": "playing",
+    "score": 0
+  },
+  "memory": {
+    "baseline": {
+      "jsHeapMB": 5.82,
+      "domNodes": 353,
+      "listeners": 175,
+      "documents": 1
+    },
+    "cycles": [
+      {
+        "cycle": 1,
+        "jsHeapMB": 7.16,
+        "domNodes": 356,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 7.67
+      },
+      {
+        "cycle": 2,
+        "jsHeapMB": 7.34,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 7.98
+      },
+      {
+        "cycle": 3,
+        "jsHeapMB": 7.52,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.13
+      },
+      {
+        "cycle": 4,
+        "jsHeapMB": 7.69,
+        "domNodes": 356,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.19
+      },
+      {
+        "cycle": 5,
+        "jsHeapMB": 7.82,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.45
+      },
+      {
+        "cycle": 6,
+        "jsHeapMB": 7.85,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.55
+      },
+      {
+        "cycle": 7,
+        "jsHeapMB": 7.92,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.46
+      },
+      {
+        "cycle": 8,
+        "jsHeapMB": 8.09,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.69
+      },
+      {
+        "cycle": 9,
+        "jsHeapMB": 8.38,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 8.98
+      },
+      {
+        "cycle": 10,
+        "jsHeapMB": 8.42,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.16
+      },
+      {
+        "cycle": 11,
+        "jsHeapMB": 8.65,
+        "domNodes": 358,
+        "listeners": 196,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.13
+      },
+      {
+        "cycle": 12,
+        "jsHeapMB": 8.75,
+        "domNodes": 358,
+        "listeners": 196,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.17
+      },
+      {
+        "cycle": 13,
+        "jsHeapMB": 8.52,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.2
+      },
+      {
+        "cycle": 14,
+        "jsHeapMB": 8.55,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.24
+      },
+      {
+        "cycle": 15,
+        "jsHeapMB": 8.57,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.33
+      },
+      {
+        "cycle": 16,
+        "jsHeapMB": 8.77,
+        "domNodes": 358,
+        "listeners": 196,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.28
+      },
+      {
+        "cycle": 17,
+        "jsHeapMB": 8.59,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.41
+      },
+      {
+        "cycle": 18,
+        "jsHeapMB": 8.64,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.2
+      },
+      {
+        "cycle": 19,
+        "jsHeapMB": 8.66,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.28
+      },
+      {
+        "cycle": 20,
+        "jsHeapMB": 8.67,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.34
+      },
+      {
+        "cycle": 21,
+        "jsHeapMB": 8.7,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.45
+      },
+      {
+        "cycle": 22,
+        "jsHeapMB": 8.72,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.39
+      },
+      {
+        "cycle": 23,
+        "jsHeapMB": 9.02,
+        "domNodes": 421,
+        "listeners": 216,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.34
+      },
+      {
+        "cycle": 24,
+        "jsHeapMB": 8.72,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.49
+      },
+      {
+        "cycle": 25,
+        "jsHeapMB": 8.8,
+        "domNodes": 358,
+        "listeners": 188,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.45
+      }
+    ]
+  }
+}

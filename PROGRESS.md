@@ -81,3 +81,15 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 - Compliance fix: the new `M` (sound) key was missing from the on-screen controls legend ("Apresente os comandos na interface") and README; added.
 - Machine was at ~91% CPU from other apps (game launcher, chat, VTT): e2e timed out. Added `PW_SLOW=1` (1 worker, 3x timeouts), documented in README. Full suite under PW_SLOW: 164/164 in 43 min.
 - Next: UI-5 (ranking setup picker) and UI-6 (rank on result) are written (stash "ui-5+ui-6" → popped after this commit) and need their e2e regression, then UI-7, UI-8; deploy + committed test report still pending.
+
+## ▶ 2026-09-30 — UI-5 … UI-8 done, final round in progress
+- UI-5 `f0aedb6`, UI-6 `69985d9`, UI-7 `e6a5f53`, UI-8 `1a2ddaf` — all pushed. Each ran lint + typecheck + unit + its affected e2e specs (PW_SLOW) + visual; only UI-8 changed a baseline (pause dialog gained the collapsed "Controls" reminder; inspected).
+- UI-7: `loadingText`/`refreshText` in `src/ui/board/retryText.ts` read TanStack's `failureCount`; max attempts = `apiConfig.retries + 1`. Default timeout 6 s → 4 s.
+- UI-8: `ControlsList` extracted from `ControlsLegend` and reused in the pause dialog (`<details>`); Dialog focus trap includes `summary`; arena host `role="img"` "Battle arena"; favicon = player ship (`ship_5.png`, bundled by Vite from index.html).
+- Deploy: the owner will deploy personally — do NOT deploy. When they send the URL: check the published site (MSW worker active, reload keeps pending records) and put the URL at the top of README.md.
+
+### Final round (in this order)
+1. Full suite `PW_SLOW=1 npm run test:e2e` (list + html reporters) → expect 184 tests (15 files).
+2. Copy `playwright-report/` → `docs/test-report/` and link it from README "Testing".
+3. Re-profile (`PROFILE_GPU=1 npm run profile`) on a quiet machine, update docs/PERFORMANCE.md.
+4. CHANGELOG `[1.1.0]`, bump package.json version, tag `v1.1.0`, update CLAUDE.md "Versão atual", push.

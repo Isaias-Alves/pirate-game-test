@@ -130,6 +130,7 @@ Reproduce a run without the UI: `?scenario=submit-timeout&seed=7&latency=0` (`la
 
 - **Unit (Vitest)**: pure simulation (movement, collisions, weapons, projectile lifecycle, enemy AI, spawner, scoring, match end), options validation, mock database, endpoints, stale-response guard.
 - **End-to-end (Playwright, Chromium desktop + mobile)**: the twelve required flows — options, asset loading / failure / retry, movement / bounds / islands, weapons / damage / cooldown / score, Chaser / Shooter / spawn interval, ending by time and death and clean restart, pause and focus loss, result and its persistence, abandoning / repeated navigation / touch controls, ranking and history paging with loading / empty / error, recording and recovery of pending matches, and timeouts / duplicates / out-of-order replies. Visual baselines: menu, arena, arena with touch controls, pause, result, options.
+- **Report of the last full run**: [docs/test-report/index.html](docs/test-report/index.html) — 184 tests, all passing (92 per project, desktop and mobile Chromium), 2026-09-30. Open it with `npx playwright show-report docs/test-report`; a fresh run writes `playwright-report/` (with traces of any failure).
 - Tests drive the game through its real inputs. Instrumentation is limited to a manual simulation clock (`?clock=manual` + `window.__game.advance()`), a seed (`?gameSeed=`) and reading state; one test uses a durable hull only to observe the timer-based ending.
 
 ## Deploy

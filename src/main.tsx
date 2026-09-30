@@ -12,7 +12,7 @@ if (!root) throw new Error('Missing #root element');
 void startMocks()
   .catch((err: unknown) => {
     // Without the worker only ranking/history are affected; the game itself keeps working.
-    console.error('Mock API failed to start', err);
+    console.warn('Mock API failed to start', err);
   })
   .then(() => {
     createRoot(root).render(

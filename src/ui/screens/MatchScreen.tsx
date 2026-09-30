@@ -111,7 +111,8 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
         setGame(current);
         setStatus('ready');
       } catch (err) {
-        console.error('Failed to start the game', err);
+        // Handled: the screen shows an error with Retry. warn, not error — this is an expected, recoverable flow.
+        console.warn('Failed to start the game', err);
         if (isCancelled()) {
           teardown();
           return;

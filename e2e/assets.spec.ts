@@ -28,7 +28,7 @@ test.describe('Asset loading', () => {
     await expect(page.locator('canvas')).toHaveCount(1);
   });
 
-  test('a failed load blocks combat with an accessible error, and Retry recovers', async ({ page }) => {
+  test('a failed load blocks combat with an accessible error, and Retry recovers', async ({ page, errors }) => {
     let failing = true;
     await page.route('**/assets/ship_*.png', async (route) => {
       if (failing) await route.abort('failed');
@@ -53,6 +53,8 @@ test.describe('Asset loading', () => {
     await expect(error).toBeHidden();
     await expect.poll(() => phase(page)).toBe('playing');
     await expect(page.locator('canvas')).toHaveCount(1);
+    // The failure is handled: the only console errors are the browser's own lines for the aborted downloads.
+    expect(errors.filter((e) => !e.includes('Failed to load resource'))).toEqual([]);
   });
 
   test('the error screen offers a way back to the menu', async ({ page }) => {

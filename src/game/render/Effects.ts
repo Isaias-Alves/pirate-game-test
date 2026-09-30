@@ -117,6 +117,6 @@ export class Effects {
 
   destroy(): void {
     this.effects = [];
-    this.layer.destroy({ children: true });
+    this.layer.destroy({ children: true, context: true });
   }
 }

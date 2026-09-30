@@ -36,12 +36,17 @@ function avoidIslands(sim: Simulation, e: Enemy, desired: number, targetDist: nu
   return turnAway === 0 ? desired : e.angle + (turnAway * Math.PI) / 2;
 }
 
+/** Hard world limits: inside the arena and out of every island. */
+function constrain(sim: Simulation, e: Enemy): void {
+  clampToArena(e, sim.config.arena.width, sim.config.arena.height);
+  for (const island of sim.islands) pushOutOfCircle(e, island);
+}
+
 function advance(sim: Simulation, e: Enemy, speed: number, dt: number): void {
   e.speed = speed;
   e.x += Math.cos(e.angle) * speed * dt;
   e.y += Math.sin(e.angle) * speed * dt;
-  clampToArena(e, sim.config.arena.width, sim.config.arena.height);
-  for (const island of sim.islands) pushOutOfCircle(e, island);
+  constrain(sim, e);
 }
 
 function stepChaser(sim: Simulation, e: Enemy, dt: number): void {
@@ -83,7 +88,10 @@ function resolveContact(sim: Simulation, e: Enemy): void {
   sim.pushEvent({ type: 'destroyed', x: e.x, y: e.y, target: 'enemy', targetId: e.id });
 }
 
-/** Keeps live ships from overlapping each other and from sitting on top of the player. */
+/**
+ * Keeps live ships from overlapping each other and from sitting on top of the player. Ship spacing is soft:
+ * the arena and islands are re-applied afterwards, so a push can never leave a ship inside an island.
+ */
 function separate(sim: Simulation): void {
   const live = sim.enemies.filter((e) => e.alive);
   for (let i = 0; i < live.length; i++) {
@@ -104,6 +112,7 @@ function separate(sim: Simulation): void {
   }
   const p = sim.player;
   for (const e of live) if (e.kind === 'shooter') pushOutOfCircle(e, p);
+  for (const e of live) constrain(sim, e);
 }
 
 export function stepEnemies(sim: Simulation, dt: number): void {

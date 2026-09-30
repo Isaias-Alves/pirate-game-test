@@ -296,7 +296,7 @@ export class Renderer {
     this.app.stage.removeChild(this.outerSea);
     this.outerSea.destroy();
     // Textures are shared/cached by the asset loader, so only the display objects are destroyed here.
-    this.world.destroy({ children: true });
+    this.world.destroy({ children: true, context: true });
     this.enemyViews.clear();
     this.ballPool.length = 0;
   }

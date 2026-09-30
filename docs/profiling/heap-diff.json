@@ -1,0 +1,257 @@
+{
+  "measuredAt": "2026-09-30T22:00:44.416Z",
+  "cycles": {
+    "warmup": 10,
+    "measured": 15
+  },
+  "totalMB": {
+    "before": 12.34,
+    "after": 12.74
+  },
+  "growthPerCycleKB": 27.3,
+  "topBySize": [
+    {
+      "key": "code | (code)",
+      "countDelta": 822,
+      "sizeDeltaKB": 198.1,
+      "countNow": 59980
+    },
+    {
+      "key": "string | (string)",
+      "countDelta": 78,
+      "sizeDeltaKB": 77.8,
+      "countNow": 34184
+    },
+    {
+      "key": "native | system / WeakArrayList",
+      "countDelta": 176,
+      "sizeDeltaKB": 24.7,
+      "countNow": 890
+    },
+    {
+      "key": "native | blink::NetworkResourcesData::ResourceData",
+      "countDelta": 33,
+      "sizeDeltaKB": 9.3,
+      "countNow": 138
+    },
+    {
+      "key": "object shape | system / Map",
+      "countDelta": 229,
+      "sizeDeltaKB": 8.9,
+      "countNow": 6993
+    },
+    {
+      "key": "native | DOMRectReadOnly",
+      "countDelta": 152,
+      "sizeDeltaKB": 8.3,
+      "countNow": 254
+    },
+    {
+      "key": "native | LayoutShift",
+      "countDelta": 54,
+      "sizeDeltaKB": 8,
+      "countNow": 91
+    },
+    {
+      "key": "native | LargestContentfulPaint",
+      "countDelta": 52,
+      "sizeDeltaKB": 6.9,
+      "countNow": 89
+    },
+    {
+      "key": "native | InteractionContentfulPaint",
+      "countDelta": 52,
+      "sizeDeltaKB": 5.3,
+      "countNow": 88
+    },
+    {
+      "key": "native | MessagePort",
+      "countDelta": 33,
+      "sizeDeltaKB": 5.2,
+      "countNow": 121
+    },
+    {
+      "key": "native | PerformanceResourceTiming",
+      "countDelta": 33,
+      "sizeDeltaKB": 4.4,
+      "countNow": 125
+    },
+    {
+      "key": "native | blink::HeapHashTableBacking<blink::HashTable<cppgc::internal::BasicMem",
+      "countDelta": 0,
+      "sizeDeltaKB": 4.1,
+      "countNow": 123
+    },
+    {
+      "key": "native | blink::HeapHashTableBacking<blink::HashTable<blink::String, blink::Key",
+      "countDelta": 0,
+      "sizeDeltaKB": 4,
+      "countNow": 12
+    },
+    {
+      "key": "object shape | system / DescriptorArray",
+      "countDelta": 48,
+      "sizeDeltaKB": 3.6,
+      "countNow": 2863
+    },
+    {
+      "key": "native | LayoutShiftAttribution",
+      "countDelta": 76,
+      "sizeDeltaKB": 3,
+      "countNow": 127
+    },
+    {
+      "key": "object | Object",
+      "countDelta": 103,
+      "sizeDeltaKB": 2.8,
+      "countNow": 2811
+    },
+    {
+      "key": "native | ReadableStream",
+      "countDelta": 33,
+      "sizeDeltaKB": 2.8,
+      "countNow": 119
+    },
+    {
+      "key": "array | (object elements)",
+      "countDelta": 15,
+      "sizeDeltaKB": 2.6,
+      "countNow": 788
+    },
+    {
+      "key": "native | blink::XHRReplayData",
+      "countDelta": 15,
+      "sizeDeltaKB": 2.6,
+      "countNow": 26
+    },
+    {
+      "key": "native | ReadableStreamDefaultController",
+      "countDelta": 33,
+      "sizeDeltaKB": 2.3,
+      "countNow": 119
+    },
+    {
+      "key": "native | blink::BasicHeapVector<blink::internal::HeapCollectionType::kGCed, cpp",
+      "countDelta": 66,
+      "sizeDeltaKB": 2.1,
+      "countNow": 394
+    },
+    {
+      "key": "native | blink::ReadableStreamDefaultController::CallPullIfNeededResolveFunctio",
+      "countDelta": 33,
+      "sizeDeltaKB": 2.1,
+      "countNow": 119
+    },
+    {
+      "key": "native | blink::ReadableStreamDefaultController::CallPullIfNeededRejectFunction",
+      "countDelta": 33,
+      "sizeDeltaKB": 2.1,
+      "countNow": 119
+    },
+    {
+      "key": "native | blink::EventTargetData",
+      "countDelta": 33,
+      "sizeDeltaKB": 1.8,
+      "countNow": 136
+    },
+    {
+      "key": "array | (object properties)",
+      "countDelta": 14,
+      "sizeDeltaKB": 1.7,
+      "countNow": 284
+    }
+  ],
+  "topByCount": [
+    {
+      "key": "code | (code)",
+      "countDelta": 822,
+      "sizeDeltaKB": 198.1,
+      "countNow": 59980
+    },
+    {
+      "key": "object shape | system / Map",
+      "countDelta": 229,
+      "sizeDeltaKB": 8.9,
+      "countNow": 6993
+    },
+    {
+      "key": "native | system / WeakArrayList",
+      "countDelta": 176,
+      "sizeDeltaKB": 24.7,
+      "countNow": 890
+    },
+    {
+      "key": "native | DOMRectReadOnly",
+      "countDelta": 152,
+      "sizeDeltaKB": 8.3,
+      "countNow": 254
+    },
+    {
+      "key": "object | Object",
+      "countDelta": 103,
+      "sizeDeltaKB": 2.8,
+      "countNow": 2811
+    },
+    {
+      "key": "native | system / ProtectedFixedArray",
+      "countDelta": 86,
+      "sizeDeltaKB": 1.2,
+      "countNow": 290
+    },
+    {
+      "key": "native | system / SharedFunctionInfoWrapper",
+      "countDelta": 86,
+      "sizeDeltaKB": 0.7,
+      "countNow": 289
+    },
+    {
+      "key": "string | (string)",
+      "countDelta": 78,
+      "sizeDeltaKB": 77.8,
+      "countNow": 34184
+    },
+    {
+      "key": "native | LayoutShiftAttribution",
+      "countDelta": 76,
+      "sizeDeltaKB": 3,
+      "countNow": 127
+    },
+    {
+      "key": "native | blink::BasicHeapVector<blink::internal::HeapCollectionType::kGCed, cpp",
+      "countDelta": 66,
+      "sizeDeltaKB": 2.1,
+      "countNow": 394
+    },
+    {
+      "key": "native | EventListener",
+      "countDelta": 66,
+      "sizeDeltaKB": 1.5,
+      "countNow": 427
+    },
+    {
+      "key": "native | blink::RegisteredEventListener",
+      "countDelta": 66,
+      "sizeDeltaKB": 1,
+      "countNow": 427
+    },
+    {
+      "key": "native | LayoutShift",
+      "countDelta": 54,
+      "sizeDeltaKB": 8,
+      "countNow": 91
+    },
+    {
+      "key": "native | LargestContentfulPaint",
+      "countDelta": 52,
+      "sizeDeltaKB": 6.9,
+      "countNow": 89
+    },
+    {
+      "key": "native | InteractionContentfulPaint",
+      "countDelta": 52,
+      "sizeDeltaKB": 5.3,
+      "countNow": 88
+    }
+  ],
+  "appClassesChanged": []
+}

@@ -54,7 +54,7 @@ Everything is a circle: ships, islands, projectiles. This keeps the maths cheap 
 
 - **Ship vs arena**: the centre is clamped so the whole circle stays inside.
 - **Ship vs island**: the ship is pushed out along the contact normal, so it slides around the shore instead of sticking.
-- **Ship vs ship**: overlapping enemies are separated symmetrically; Shooters are also pushed out of the player. A Chaser that overlaps the player deals its contact damage once and is destroyed on the spot.
+- **Ship vs ship**: overlapping enemies are separated symmetrically; Shooters are also pushed out of the player. This spacing is soft: the arena and island limits are applied again afterwards, so a push from another ship can never leave a ship inside an island or outside the arena. A Chaser that overlaps the player deals its contact damage once and is destroyed on the spot.
 - **Projectiles** use a **swept** test (segment from last to new position against each circle, with the projectile radius as padding), so a fast shot cannot tunnel through a ship or island between two steps. A projectile is marked dead on its first hit, so it can damage only once; dead ones are swept out of the array at the end of the step. Player shots only test enemies, enemy shots only the player. Islands and the arena edge remove any projectile; so does expiry.
 - A destroyed enemy leaves the world at the end of the step: it can no longer collide, shoot or hurt anyone.
 
@@ -68,7 +68,7 @@ Everything is a circle: ships, islands, projectiles. This keeps the maths cheap 
 ## Resource lifecycle
 
 - Textures are fetched with `fetch` + `createImageBitmap` and cached at module level, so a failed load leaves nothing behind (a retry really goes back to the network) and every match reuses the same decoded textures. Assembled texture sets are cached per density so cropped island textures are created once. All-or-nothing: any failing file rejects the load, the UI shows an alert with **Retry**, and combat never starts half-loaded. Progress is reported per file.
-- Sprites are pooled or destroyed with their owner: projectile sprites live in a pool that grows on demand and is hidden when unused; enemy views are created when an enemy appears and destroyed when it leaves; effects destroy themselves when they expire. `Renderer.destroy()` destroys the whole scene graph but never the shared textures.
+- Sprites are pooled or destroyed with their owner: projectile sprites live in a pool that grows on demand and is hidden when unused; enemy views are created when an enemy appears and destroyed when it leaves; effects destroy themselves when they expire. `Renderer.destroy()` destroys the whole scene graph but never the shared textures. Containers holding `Graphics` (health-bar masks, arena edge, effects) are destroyed with `{ children: true, context: true }`: in Pixi 8 a `Graphics` frees its own geometry context only on a bare `destroy()`, so with options it has to be asked explicitly.
 - `Game.dispose()` removes the ticker callback, the `blur` / `visibilitychange` listeners and the keyboard listeners, and clears end-of-match listeners. `MatchScreen` also disconnects the `ResizeObserver` and the pixel-ratio watcher and destroys the `Application`.
 
 ## Sound

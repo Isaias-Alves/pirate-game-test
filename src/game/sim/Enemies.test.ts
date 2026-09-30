@@ -198,3 +198,22 @@ describe('destroyed enemies', () => {
     expect(sim.player.health).toBe(gameConfig.player.maxHealth);
   });
 });
+
+describe('ship separation', () => {
+  it('never pushes a ship into an island or out of the arena', () => {
+    const sim = quiet();
+    const isl = sim.islands[0];
+    if (!isl) throw new Error('need island');
+    const r = sim.config.chaser.radius;
+    // One ship pinned against the island's east shore and one against the west wall, each overlapped from outside.
+    addEnemy(sim, 'chaser', isl.x + isl.radius + r, isl.y);
+    addEnemy(sim, 'chaser', isl.x + isl.radius + r + 20, isl.y);
+    addEnemy(sim, 'chaser', r, 100);
+    addEnemy(sim, 'chaser', r + 20, 100);
+    sim.step(DT, idle);
+    for (const e of sim.enemies) {
+      expect(Math.hypot(e.x - isl.x, e.y - isl.y)).toBeGreaterThanOrEqual(isl.radius + e.radius - 1e-6);
+      expect(e.x).toBeGreaterThanOrEqual(e.radius - 1e-6);
+    }
+  });
+});

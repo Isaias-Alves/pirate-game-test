@@ -57,7 +57,23 @@ Each cycle: start a match, play 60 simulated seconds with sailing and firing (fa
 | 5 | 8.30 | 426 | 189 | 0 |
 
 - DOM nodes, event listeners and canvases are **flat** from the first cycle on: the disposal path (ticker callback, window/document listeners, keyboard listeners, resize/pixel-ratio watchers, scene graph, Pixi `Application`) releases what it creates.
-- The JS heap rises by about 0.18 MB per cycle in the first cycles (the menu itself has ~50 more DOM nodes than at 1.0.0: setup picker, sound legend row). To check whether that is a leak, the same test was run for **25 cycles** ([profiling/results-25-cycles.json](profiling/results-25-cycles.json)): the heap climbs from 7.4 MB to 8.7 MB by cycle 11 — one-off warm-up of library caches (Pixi, TanStack Query, MSW, the texture cache reused by every match) — and then almost levels off: +0.3 MB over the next 14 cycles (8.73 → 9.03 MB, about 20 KB per match), while DOM nodes (410), listeners (189) and leftover canvases (0) stay exactly flat. At 1.0.0 the late cycles only wobbled (8.5–9.0 MB with no trend), so the small residual slope appeared with the 1.1.0 additions; see Limitations.
+- The JS heap rises by about 0.18 MB per cycle in the first cycles (the menu itself has ~50 more DOM nodes than at 1.0.0: setup picker, sound legend row). To check whether that is a leak, the same test was run for **25 cycles** ([profiling/results-25-cycles.json](profiling/results-25-cycles.json)): the heap climbs from 7.4 MB to 8.7 MB by cycle 11 — one-off warm-up of library caches (Pixi, TanStack Query, MSW, the texture cache reused by every match) — and then almost levels off: +0.3 MB over the next 14 cycles (8.73 → 9.03 MB, about 20 KB per match), while DOM nodes (410), listeners (189) and leftover canvases (0) stay exactly flat. The residual slope was investigated with a heap-snapshot diff (next section): it is not game state.
+
+### What the residual growth is — heap-snapshot diff
+
+`npm run profile:heap` ([scripts/heap-diff.mjs](../scripts/heap-diff.mjs)) plays 10 warm-up cycles, takes a heap snapshot, plays 15 more, takes another, and compares object counts and sizes per constructor. Result: [profiling/heap-diff.json](profiling/heap-diff.json).
+
+| Growth over 15 cycles | Size | What it is |
+| --- | ---: | --- |
+| Compiled code (`code`) | +198 KB | V8 bytecode and optimised code for functions that warm up over time; bounded by the size of the app |
+| Strings (78, ~1 KB each, the size of a list response), `NetworkResourcesData`, `MessagePort`, `ReadableStream` | ~+100 KB | Records of the two list requests made each time the menu reopens (33 in total): the counts match the requests, and they are held by the DevTools network capture that the profiler itself attaches and by one MSW message channel per request |
+| V8 internals (`WeakArrayList`, object shapes) | ~+35 KB | Engine bookkeeping that grows with compiled code |
+| `LayoutShift`, `LargestContentfulPaint`, `InteractionContentfulPaint`, `DOMRectReadOnly` | ~+30 KB | Performance-timeline entries buffered by the browser (buffers are capped) |
+| **Game, Pixi, TanStack Query and audio classes** (Sprite, Container, Graphics, Texture, Game, Simulation, Renderer, AudioContext, Query…) | **0** | No count changes at all between cycle 10 and cycle 25 |
+
+So about 27 KB per cycle in this harness comes from the JavaScript engine and the browser, and part of it (the DevTools capture) does not exist for a normal visitor. Nothing that a match creates survives it.
+
+The diff also led to one clean-up that did not change these numbers: Pixi 8 frees a `Graphics` object's own geometry context only on a bare `destroy()`, so the health-bar masks, arena edge and effects are now destroyed with `{ children: true, context: true }` instead of waiting for Pixi's resource collector.
 
 ## Limitations
 
@@ -65,7 +81,7 @@ Each cycle: start a match, play 60 simulated seconds with sailing and firing (fa
 - Frame pacing was measured at DPR 1. At higher DPR the renderer caps at 2× (`MAX_RESOLUTION`), which increases fill cost roughly fourfold on a 2× display; the scene is simple, so this is expected to be comfortable on current hardware but was not measured here.
 - The simulation is not interpolated between its 60 Hz fixed steps; on displays faster than 60 Hz frames may repeat a state.
 - Heap numbers are `JSHeapUsedSize` after a forced collection; GPU memory is not included.
-- The ~20 KB-per-match heap slope after warm-up (1.1.0) was not traced to a source. Nothing visible is retained (DOM, listeners and canvases are flat), and at that rate a hundred matches in one tab add about 2 MB. The next step would be a heap-snapshot diff between cycle 10 and cycle 25, starting with the per-match `AudioContext` (created and closed each match).
+- The heap keeps a slope of ~20–27 KB per cycle after warm-up. The heap-snapshot diff attributes it to compiled code and browser-held request/performance records, not to objects created by a match; a very long session (hundreds of matches in one tab) was not measured.
 
 ## Reproduce
 
@@ -73,6 +89,7 @@ Each cycle: start a match, play 60 simulated seconds with sailing and firing (fa
 npm run profile                                   # builds the e2e bundle, then profiles (software GL by default)
 PROFILE_GPU=1 npm run profile                     # request hardware GL (Windows/D3D11), as used for this report
 PROFILE_SECONDS=180 PROFILE_CYCLES=5 PROFILE_GPU=1 node scripts/profile.mjs   # explicit settings (needs the e2e build served on :4174)
+npm run profile:heap                              # heap-snapshot diff, cycle 10 vs cycle 25 (needs the e2e build served on :4174)
 ```
 
 `npm run profile` expects `npm run preview:e2e` to be serving `dist-e2e` on port 4174 (`PROFILE_URL` overrides).

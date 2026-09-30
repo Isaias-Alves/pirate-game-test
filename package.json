@@ -16,7 +16,8 @@
     "test:e2e": "npm run build:e2e && playwright test",
     "test:e2e:ui": "npm run build:e2e && playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "profile": "npm run build:e2e && node scripts/profile.mjs"
+    "profile": "npm run build:e2e && node scripts/profile.mjs",
+    "profile:heap": "node scripts/heap-diff.mjs"
   },
   "dependencies": {
     "@fontsource/lilita-one": "^5.3.0",

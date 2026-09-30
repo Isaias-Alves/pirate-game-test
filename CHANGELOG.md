@@ -6,6 +6,15 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ### Added
 - Published at https://pirate-game-test.vercel.app (Vercel). Checked on the live site: the MSW service worker controls the page, lists load, failure scenarios show retries and recover, and a match recorded under "Recording unavailable" is kept, re-sent after a reload and listed once.
+- `npm run profile:heap` ([scripts/heap-diff.mjs](scripts/heap-diff.mjs)): heap-snapshot diff between cycle 10 and cycle 25. [docs/PERFORMANCE.md](docs/PERFORMANCE.md) now explains the residual heap slope: compiled code and browser-held request/performance records; no game, Pixi, query or audio object accumulates.
+
+### Fixed
+- Ship separation could leave an enemy overlapping an island, or outside the arena, for one step when another ship pushed it; the arena and island limits are now applied again after separation (new unit test).
+
+### Changed
+- Scene containers are destroyed with `{ children: true, context: true }`, so `Graphics` contexts (health-bar masks, arena edge, effects) are freed at once instead of by Pixi's resource collector.
+- Handled failures (asset load, mock worker start) log a warning instead of a console error; the asset-failure e2e test now checks that the only console errors are the browser's own resource-load lines.
+- README states the supported phone orientation (landscape; portrait also works) and lists every visual baseline.
 
 ## [1.1.0] — 2026-09-30
 

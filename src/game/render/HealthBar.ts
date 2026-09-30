@@ -52,6 +52,7 @@ export class HealthBar {
   }
 
   destroy(): void {
-    this.view.destroy({ children: true });
+    // context: true — Pixi 8 only frees a Graphics' own context on a bare destroy(); with options it must be asked.
+    this.view.destroy({ children: true, context: true });
   }
 }

@@ -26,7 +26,7 @@ All optional. They only tune network behaviour and are read at build time.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `VITE_API_TIMEOUT_MS` | `6000` | Axios request timeout |
+| `VITE_API_TIMEOUT_MS` | `4000` | Axios request timeout (above the slowest simulated latency, 3 s) |
 | `VITE_API_RETRIES` | `2` | Automatic retries for reads and for match submission (network errors, timeouts and 5xx only; never 4xx) |
 | `VITE_API_RETRY_BASE_MS` | `600` | First retry delay; doubles on each attempt |
 | `VITE_E2E` | unset | `1` exposes test hooks (`window.__game`, `?clock=manual`, `?gameSeed=`). Set by `--mode e2e`; never enabled in a normal production build |

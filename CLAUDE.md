@@ -118,7 +118,7 @@ Uma de cada vez, cada uma com commit próprio e testes de regressão (lint + typ
 - [x] UI-4 — sons (assets/sounds) + botão de mudo persistido, pausando junto com o jogo e só iniciando após gesto do usuário. Enunciado: permitido ("recursos complementares"); console sem erros (autoplay).
 - [x] UI-5 — ranking: seletor de configuração (padrão = opções atuais). Enunciado: continua comparando só partidas com a mesma configuração.
 - [x] UI-6 — resultado: mostrar a posição no ranking depois que a partida for registrada. Enunciado: resultado continua com pontuação, tempo, motivo, situação do registro e as duas ações.
-- [ ] UI-7 — feedback de rede nas listas: mostrar tentativas ("retrying 1/2") e timeout padrão menor. Enunciado: "Gerencie carregamento, vazio, erro, atualização em segundo plano… e retries".
+- [x] UI-7 — feedback de rede nas listas: mostrar tentativas ("retrying 1/2") e timeout padrão menor. Enunciado: "Gerencie carregamento, vazio, erro, atualização em segundo plano… e retries".
 - [ ] UI-8 — polimento: lembrete de controles no diálogo de pausa, favicon, rótulo acessível no canvas, aviso de "gire o aparelho" sem quebra. Enunciado: "Apresente os comandos na interface".
 
 

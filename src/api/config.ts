@@ -10,7 +10,7 @@ const num = (raw: unknown, fallback: number): number => {
 export const apiConfig = {
   baseURL: '/api',
   /** Axios request timeout. */
-  timeoutMs: num(import.meta.env.VITE_API_TIMEOUT_MS, 6000),
+  timeoutMs: num(import.meta.env.VITE_API_TIMEOUT_MS, 4000),
   /** Automatic retries for reads and for the (idempotent) match submission. */
   retries: num(import.meta.env.VITE_API_RETRIES, 2),
   /** First retry delay; doubles each attempt. */

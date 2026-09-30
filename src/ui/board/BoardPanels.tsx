@@ -5,6 +5,8 @@ import { useHistory, useRanking } from '../../api/hooks';
 import { loadOptions } from '../../storage/options';
 import { getPlayer } from '../../storage/player';
 import { END_REASON_TEXT, formatClock, formatDate } from '../format';
+import { apiConfig } from '../../api/config';
+import { loadingText, refreshText } from './retryText';
 import { describeSetup, rankingSetups } from './setups';
 
 interface QueryLike<T> {
@@ -13,6 +15,8 @@ interface QueryLike<T> {
   isError: boolean;
   isFetching: boolean;
   isPlaceholderData: boolean;
+  /** Failed attempts of the current fetch (TanStack Query counts them while it retries). */
+  failureCount: number;
   error: unknown;
   refetch: () => unknown;
 }
@@ -70,7 +74,7 @@ function ListShell<T>({
   if (query.isPending) {
     return (
       <p className="board__status" role="status" data-testid="board-loading">
-        Loading {what}…
+        {loadingText(what, query.failureCount, apiConfig.retries + 1)}
       </p>
     );
   }
@@ -118,7 +122,7 @@ function ListShell<T>({
       {children(data.items, data)}
       <Pager page={page} totalPages={data.totalPages} onPage={onPage} />
       <p className="board__hint" data-testid="board-count">
-        {data.total} {data.total === 1 ? 'match' : 'matches'} · {query.isFetching ? 'updating…' : 'up to date'}
+        {data.total} {data.total === 1 ? 'match' : 'matches'} · {refreshText(query.isFetching, query.failureCount)}
       </p>
     </div>
   );

@@ -52,6 +52,15 @@ test.describe('Ranking and Match History lists', () => {
     await expect(page.getByTestId('board-loading')).toHaveCount(0);
   });
 
+  test('a request that keeps failing says it is retrying before it gives up', async ({ page }) => {
+    // e2e build: 3.5 s timeout and one retry, so two attempts in all.
+    await openMenu(page, { scenario: 'timeout' });
+    const loading = page.getByTestId('board-loading');
+    await expect(loading).toHaveText('Loading the ranking…');
+    await expect(loading).toContainText('trying again (attempt 2 of 2)', { timeout: 10_000 });
+    await expect(page.getByTestId('board-error')).toContainText('took too long', { timeout: 10_000 });
+  });
+
   test('shows an empty state when there is nothing to list', async ({ page }) => {
     await openMenu(page, { scenario: 'empty' });
     await expect(page.getByTestId('board-empty')).toContainText('No matches recorded for this setup yet');

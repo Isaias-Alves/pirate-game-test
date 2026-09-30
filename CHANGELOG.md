@@ -11,8 +11,11 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 - UI-4: sound from the asset pack: cannon fire (front vs broadside), hits, splashes, ramming, explosions, sinking, score, low-hull and 10 s warnings, start/pause/resume/end stings, ocean ambience and a sailing loop that follows the ship speed. HUD speaker button and `M` key toggle sound (remembered across visits; listed in the controls legend). Audio never blocks the game: every failure is silent, loops fade while paused.
 - UI-5: ranking **Setup** picker: opens on the player setup, can browse other setups; paging restarts per setup. Each table still compares only matches with identical settings.
 - UI-6: the result screen shows the ranking position once the match is recorded (`#12 of 35 for this setup`). `POST /api/matches` replies now include `rank` and `rankedOf` (same on idempotent replays).
+- UI-7: lists say when a request is being retried (`Loading the ranking… No answer yet, trying again (attempt 2 of 3).`, and `updating… (retrying)` on background refreshes).
 
 ### Changed
+
+- Default request timeout 6 s → 4 s (still above the slowest simulated latency, 3 s), so a dead server is reported sooner.
 - `PW_SLOW=1` Playwright mode for busy or low-end machines (1 worker, 3x timeouts).
 - Menu visual regression also captures the bottom of the menu (the menu scrolls inside `.scene`, so `fullPage` only covered the first screen).
 - HUD heart icon now sits centred beside the health bar (a CSS specificity bug pushed it up and clipped it on short screens).

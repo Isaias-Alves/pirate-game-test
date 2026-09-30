@@ -5,7 +5,7 @@ import { useSubmissions } from '../../api/submissionsContext';
 import { Game } from '../../game/Game';
 import { currentResolution, watchPixelRatio } from '../../game/pixelRatio';
 import type { MatchResult } from '../../game/matchStore';
-import { exposeGame } from '../../game/testHooks';
+import { exposeGame, readTestOptions } from '../../game/testHooks';
 import { loadOptions, matchConfig } from '../../storage/options';
 import { saveLastResult } from '../../storage/results';
 import { Hud } from '../Hud';
@@ -92,7 +92,9 @@ export function MatchScreen({ onExit }: { onExit: () => void }) {
           return;
         }
 
-        current = new Game(app, textures, matchConfig(loadOptions()));
+        const test = readTestOptions();
+        current = new Game(app, textures, matchConfig(loadOptions()), test.gameSeed);
+        current.manualClock = test.manualClock;
         current.onMatchEnd((r) => {
           saveLastResult(r);
           // Stored durably before any network call, so a failure or reload cannot lose the result.

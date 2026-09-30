@@ -5,7 +5,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'assets', 'node_modules'] },
+  { ignores: ['dist', 'dist-e2e', 'assets', 'node_modules', 'playwright-report', 'test-results', 'public/mockServiceWorker.js'] },
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
@@ -19,4 +19,6 @@ export default tseslint.config(
   },
   { files: ['*.js', '*.ts'], languageOptions: { globals: globals.node } },
   { files: ['**/*.js'], extends: [tseslint.configs.disableTypeChecked] },
+  // Playwright fixtures call `use(...)`, which the React hooks rule mistakes for a hook.
+  { files: ['e2e/**/*.ts'], rules: { 'react-hooks/rules-of-hooks': 'off' } },
 );

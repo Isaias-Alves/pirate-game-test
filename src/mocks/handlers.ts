@@ -53,34 +53,40 @@ function viewFor(scenario: ScenarioId): DataView {
   return { fixtures: scenario !== 'empty', extraFixtures: scenario === 'paginated', syntheticHistory: scenario === 'paginated' };
 }
 
-/**
- * Applies the active scenario to one request: waits the simulated latency, then either returns a failure
- * response or `undefined` to let the real handler answer.
- */
-async function applyScenario(kind: Kind): Promise<{ failure?: Response; scenario: ScenarioId }> {
+/** What the active scenario will do to one request. Decided on arrival; nothing here waits. */
+interface Plan {
+  scenario: ScenarioId;
+  waitMs: number;
+  /** Answer with this instead of the real payload. */
+  failure?: Response;
+  /** Never answer at all (the client times out). */
+  hang: boolean;
+}
+
+function planRequest(kind: Kind): Plan {
   const settings = loadMockSettings();
   const n = runtime.requests++;
   const { scenario } = settings;
+  const plan: Plan = { scenario, waitMs: latencyMs(scenario, n, settings.seed) * settings.latencyScale, hang: scenario === 'timeout' };
 
-  const wait = latencyMs(scenario, n, settings.seed) * settings.latencyScale;
-  if (wait > 0) await delay(wait);
+  if (scenario === 'network-error') plan.failure = HttpResponse.error();
+  else if (scenario === 'http-5xx') plan.failure = error(500, 'server_error', 'Something broke on our side.');
+  else if (scenario === 'http-4xx') plan.failure = kind === 'submit' ? error(400, 'bad_request', 'Request rejected.') : error(404, 'not_found', 'Nothing here.');
+  else if (scenario === 'ranking-fails' && kind === 'ranking') plan.failure = error(500, 'server_error', 'Ranking is down.');
+  else if (scenario === 'history-fails' && kind === 'history') plan.failure = error(500, 'server_error', 'History is down.');
+  else if (kind === 'submit' && scenario === 'submit-unavailable') plan.failure = error(503, 'unavailable', 'Recording is unavailable.');
+  else if (kind === 'submit' && scenario === 'submit-flaky' && runtime.flakyFailures < 2) {
+    runtime.flakyFailures += 1;
+    plan.failure = error(503, 'unavailable', 'Recording is unavailable.');
+  }
+  return plan;
+}
 
-  if (scenario === 'timeout') await delay('infinite');
-  if (scenario === 'network-error') return { failure: HttpResponse.error(), scenario };
-  if (scenario === 'http-5xx') return { failure: error(500, 'server_error', 'Something broke on our side.'), scenario };
-  if (scenario === 'http-4xx') {
-    return { failure: kind === 'submit' ? error(400, 'bad_request', 'Request rejected.') : error(404, 'not_found', 'Nothing here.'), scenario };
-  }
-  if (scenario === 'ranking-fails' && kind === 'ranking') return { failure: error(500, 'server_error', 'Ranking is down.'), scenario };
-  if (scenario === 'history-fails' && kind === 'history') return { failure: error(500, 'server_error', 'History is down.'), scenario };
-  if (kind === 'submit') {
-    if (scenario === 'submit-unavailable') return { failure: error(503, 'unavailable', 'Recording is unavailable.'), scenario };
-    if (scenario === 'submit-flaky' && runtime.flakyFailures < 2) {
-      runtime.flakyFailures += 1;
-      return { failure: error(503, 'unavailable', 'Recording is unavailable.'), scenario };
-    }
-  }
-  return { scenario };
+/** Waits out the simulated latency, then returns the failure to send (undefined = send the real payload). */
+async function settle(plan: Plan): Promise<Response | undefined> {
+  if (plan.waitMs > 0) await delay(plan.waitMs);
+  if (plan.hang) await delay('infinite');
+  return plan.failure;
 }
 
 const positiveInt = (raw: string | null, fallback: number, max: number): number | undefined => {
@@ -89,44 +95,52 @@ const positiveInt = (raw: string | null, fallback: number, max: number): number 
   return Number.isInteger(n) && n >= 1 && n <= max ? n : undefined;
 };
 
+/**
+ * Reads are answered from the data as it is when the request ARRIVES, then delayed: a slow response is a
+ * genuinely stale snapshot, exactly like a real slow network. That is what makes out-of-order scenarios real.
+ */
 export const handlers = [
   http.get('*/api/ranking', async ({ request }) => {
-    const { failure, scenario } = await applyScenario('ranking');
-    if (failure) return failure;
+    const plan = planRequest('ranking');
     const q = new URL(request.url).searchParams;
     const page = positiveInt(q.get('page'), 1, 10_000);
     const pageSize = positiveInt(q.get('pageSize'), DEFAULT_PAGE_SIZE, 100);
     const sessionSeconds = Number(q.get('sessionSeconds'));
     const spawnInterval = Number(q.get('spawnInterval'));
-    if (page === undefined || pageSize === undefined || !Number.isFinite(sessionSeconds) || !Number.isFinite(spawnInterval)) {
-      return error(400, 'bad_request', 'Invalid ranking query.');
-    }
-    return HttpResponse.json(db.ranking({ sessionSeconds, spawnInterval }, page, pageSize, viewFor(scenario)));
+    const invalid = page === undefined || pageSize === undefined || !Number.isFinite(sessionSeconds) || !Number.isFinite(spawnInterval);
+    const answer = invalid
+      ? error(400, 'bad_request', 'Invalid ranking query.')
+      : HttpResponse.json(db.ranking({ sessionSeconds, spawnInterval }, page, pageSize, viewFor(plan.scenario)));
+    return (await settle(plan)) ?? answer;
   }),
 
   http.get('*/api/players/:playerId/matches', async ({ request, params }) => {
-    const { failure, scenario } = await applyScenario('history');
-    if (failure) return failure;
+    const plan = planRequest('history');
     const q = new URL(request.url).searchParams;
     const page = positiveInt(q.get('page'), 1, 10_000);
     const pageSize = positiveInt(q.get('pageSize'), DEFAULT_PAGE_SIZE, 100);
     const playerId = typeof params.playerId === 'string' ? params.playerId : '';
-    if (page === undefined || pageSize === undefined || playerId === '') return error(400, 'bad_request', 'Invalid history query.');
-    return HttpResponse.json(db.history(decodeURIComponent(playerId), PLAYER_NAME, page, pageSize, viewFor(scenario)));
+    const answer =
+      page === undefined || pageSize === undefined || playerId === ''
+        ? error(400, 'bad_request', 'Invalid history query.')
+        : HttpResponse.json(db.history(decodeURIComponent(playerId), PLAYER_NAME, page, pageSize, viewFor(plan.scenario)));
+    return (await settle(plan)) ?? answer;
   }),
 
   http.post('*/api/matches', async ({ request }) => {
-    const { failure, scenario } = await applyScenario('submit');
-    if (failure) return failure;
+    const plan = planRequest('submit');
+    // A failing or hanging server never stored anything.
+    if (plan.failure || plan.hang) return (await settle(plan)) ?? error(500, 'server_error', 'Unreachable');
+
     const body: unknown = await request.json().catch(() => undefined);
     const record = parseRecord(body);
-    if (typeof record === 'string') return error(400, 'bad_request', record);
+    if (typeof record === 'string') return (await settle(plan)) ?? error(400, 'bad_request', record);
 
     const result = db.submit(record);
     // The match is stored, but the reply is lost: the client must retry and get the same record back.
-    if (scenario === 'submit-timeout') await delay('infinite');
+    if (plan.scenario === 'submit-timeout') plan.hang = true;
 
     const payload: SubmitResponse = { record: result.record, created: result.created, revision: db.revision };
-    return HttpResponse.json(payload, { status: result.created ? 201 : 200 });
+    return (await settle(plan)) ?? HttpResponse.json(payload, { status: result.created ? 201 : 200 });
   }),
 ];

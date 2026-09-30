@@ -294,11 +294,11 @@
 }
 
 /* ---------- Dialogs (pause, result) ---------- */
+/* margin:auto on the panel centres it but, unlike place-items:center, never crops it when it is taller than the screen. */
 .overlay {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
   padding: 12px;
   background: rgb(4 14 22 / 0.6);
   z-index: 10;
@@ -307,6 +307,7 @@
 
 .overlay__panel {
   width: min(100%, 420px);
+  margin: auto;
   text-align: center;
 }
 
@@ -374,16 +375,77 @@
   font-weight: 700;
 }
 
-@media (max-height: 520px) {
+/* Short screens (laptops, phones in landscape): compact dialogs; the result goes two-column. */
+@media (max-height: 780px) {
   .overlay__panel {
-    border-width: 28px 24px;
-    border-image-width: 28px 24px;
+    border-width: 30px 26px;
+    border-image-width: 30px 26px;
+  }
+  .overlay__panel h2 {
+    margin-bottom: 4px;
+  }
+  .overlay .btn {
+    height: 74px;
   }
   .result__score {
-    font-size: 56px;
+    font-size: 64px;
+    margin-bottom: 4px !important;
   }
-  .btn {
-    height: 72px;
+  .record {
+    min-height: 5.4em;
+  }
+}
+
+@media (max-height: 560px) {
+  .overlay {
+    padding: 6px;
+  }
+  .overlay .btn {
+    height: 58px;
+    font-size: 19px;
+    padding: 0 22px 3px;
+  }
+  .overlay .btn--small {
+    height: 52px;
+    width: 150px;
+  }
+  .result {
+    width: min(100%, 700px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    align-items: center;
+  }
+  .result h2 {
+    grid-column: 1 / -1;
+    font-size: 26px;
+  }
+  .result__score {
+    font-size: 48px;
+  }
+  .result__score-label {
+    font-size: 16px;
+  }
+  .result__stats {
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+  .record {
+    min-height: 4.4em;
+    margin-bottom: 8px !important;
+    font-size: 13px;
+  }
+  .pause {
+    width: min(100%, 560px);
+  }
+  .pause__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pause p {
+    margin-bottom: 8px;
+    font-size: 14px;
   }
 }
 
@@ -521,6 +583,11 @@
 
 /* ---------- Record status (result dialog) and pending banner (menu) ---------- */
 .record {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 7.6em;
   margin: 0 0 14px !important;
   padding: 8px 12px;
   border-radius: 8px;
@@ -627,4 +694,56 @@
   min-height: 1.4em;
   font-size: 14px;
   color: var(--ok);
+}
+
+/* A heading focused by script (screen change) needs no ring: it is not interactive. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* Very short screens (phone landscape): squeeze the result dialog so nothing needs scrolling. */
+@media (max-height: 560px) {
+  .overlay__panel {
+    border-width: 24px 22px;
+    border-image-width: 24px 22px;
+    padding: 0 6px 2px;
+  }
+  .result h2 {
+    margin: 0;
+  }
+  .result__score {
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 44px;
+  }
+  .result__stats {
+    gap: 4px;
+  }
+  .result__stats > div {
+    padding: 3px 10px;
+  }
+  .record {
+    min-height: 3.2em;
+    margin-bottom: 6px !important;
+    padding: 4px 8px;
+  }
+  .record p {
+    margin: 0 0 4px;
+  }
+  .result__actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 4px;
+  }
+  .result__actions .btn {
+    width: 150px;
+    height: 52px;
+    font-size: 17px;
+    padding: 0 12px 3px;
+  }
+  .pause .btn {
+    height: 50px;
+  }
 }

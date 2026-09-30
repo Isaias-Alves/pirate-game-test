@@ -27,6 +27,8 @@ export class Game {
   private phase: MatchPhase = 'playing';
   private pauseCause: MatchSnapshot['pauseCause'] = null;
   private disposed = false;
+  /** Test instrumentation: when true the wall-clock ticker never steps the simulation; only advance() does. */
+  manualClock = false;
 
   constructor(
     private readonly app: Application,
@@ -124,7 +126,7 @@ export class Game {
   };
 
   private readonly onTick = (ticker: Ticker): void => {
-    if (this.phase === 'playing') {
+    if (this.phase === 'playing' && !this.manualClock) {
       const { fixedStep, maxFrameDelta } = this.config.simulation;
       this.accumulator += Math.min(ticker.deltaMS / 1000, maxFrameDelta);
       while (this.accumulator >= fixedStep && this.isPlaying()) {

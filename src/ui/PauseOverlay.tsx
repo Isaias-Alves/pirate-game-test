@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import type { Game } from '../game/Game';
 import { Dialog } from './Dialog';
+import { useClickGuard } from './useClickGuard';
 import { useMatch } from './useMatch';
 
 interface PauseOverlayProps {
@@ -21,6 +22,7 @@ export function PauseOverlay({ game, onRestart, onExit }: PauseOverlayProps) {
 
 function PauseDialog({ game, focusCause, onRestart, onExit }: PauseOverlayProps & { focusCause: 'manual' | 'focus' | null }) {
   const resume = useRef<HTMLButtonElement>(null);
+  const guarded = useClickGuard();
   return (
     <Dialog labelledBy="pause-title" initialFocus={resume} className="pause">
       <h2 id="pause-title">Paused</h2>
@@ -30,17 +32,17 @@ function PauseDialog({ game, focusCause, onRestart, onExit }: PauseOverlayProps 
           ref={resume}
           type="button"
           className="btn"
-          onClick={() => {
+          onClick={guarded(() => {
             game.resume();
-          }}
+          })}
           data-testid="resume"
         >
           Resume
         </button>
-        <button type="button" className="btn btn--secondary btn--small" onClick={onRestart} data-testid="restart">
+        <button type="button" className="btn btn--secondary btn--small" onClick={guarded(onRestart)} data-testid="restart">
           Restart
         </button>
-        <button type="button" className="btn btn--secondary btn--small" onClick={onExit} data-testid="quit">
+        <button type="button" className="btn btn--secondary btn--small" onClick={guarded(onExit)} data-testid="quit">
           Main Menu
         </button>
       </div>

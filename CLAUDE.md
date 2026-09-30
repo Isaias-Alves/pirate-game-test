@@ -100,7 +100,7 @@ _Atualizar esta seção no fim de cada sessão, para a próxima já saber onde p
 - [x] Fase 10 — camada de dados de ranking/histórico (typed contracts, Axios client, MSW handlers+MockDb+fixtures shared, TanStack hooks w/ revision-guard, idempotent submit + persisted pending queue + retry; 76 tests; verified in browser incl. timeout-after-commit and reload recovery)
 - [x] Fase 11 — controles de cenário do MSW (visible select of 15 scenarios + instant-latency toggle + confirmed reset; verified in dev and in the production build via vite preview)
 - [x] Fase 12 — limpeza/passagem com Strict Mode (disposal audit; texture sets cached per density; 10 Play→Menu cycles + 20 restarts checked in browser: 0 leftover canvases, no errors, heap flat; formal memory profile in phase 14)
-- [ ] Fase 13 — suíte Playwright
+- [x] Fase 13 — suíte Playwright (150 tests green: 75 x chromium-desktop + chromium-mobile; all 12 mandatory flows + visual regression baselines for menu, arena, arena+touch, pause, result, options; HTML report + traces on failure)
 - [ ] Fase 14 — docs + profiling
 - [ ] Fase 15 — deploy (fazer cedo, repetir sempre)
 

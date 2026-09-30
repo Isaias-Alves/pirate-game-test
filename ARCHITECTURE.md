@@ -10,7 +10,8 @@ src/
     gameConfig.ts       every balance value, one typed object
     sim/                pure rules: Simulation, collision, enemyAI, spawner, rng (no Pixi, no DOM)
     input/              keyboard -> InputState (touch writes the same object)
-    render/             Pixi scene that mirrors the simulation (Renderer, HealthBar, Effects)
+    render/             Pixi scene that mirrors the simulation (Renderer, HealthBar, Effects, damage rules)
+    audio/              Web Audio sound driven by the same simulation events (soundMap, AudioEngine, GameAudio)
     Game.ts             glue: ticker, fixed-step loop, pause, restart, disposal, MatchStore
     assets.ts           texture manifest + loader/cache
     matchStore.ts       external store the UI subscribes to
@@ -21,7 +22,9 @@ src/
 e2e/                    Playwright specs + visual baselines
 ```
 
-Dependencies point one way: `sim` knows nothing about anything else; `render` and `Game` read the simulation; React only sees the game through `MatchStore` and a handful of methods (`pause`, `resume`, `restart`, `setControl`, `onMatchEnd`).
+Dependencies point one way: `sim` knows nothing about anything else; `render` and `Game` read the simulation; React only sees the game through `MatchStore` and a handful of methods (`pause`, `resume`, `restart`, `setControl`, `toggleMute`, `onMatchEnd`).
+
+Each frame, `Game.present()` drains the simulation's one-shot events (`shot` with the weapon that fired, `hit`, `splash`, `rammed`, `destroyed`) and hands the same list to the renderer (effects, hit tint, camera shake) and to the audio layer. Both are presentation: they read the simulation and never change it.
 
 ## React and PixiJS integration
 
@@ -68,6 +71,10 @@ Everything is a circle: ships, islands, projectiles. This keeps the maths cheap 
 - Sprites are pooled or destroyed with their owner: projectile sprites live in a pool that grows on demand and is hidden when unused; enemy views are created when an enemy appears and destroyed when it leaves; effects destroy themselves when they expire. `Renderer.destroy()` destroys the whole scene graph but never the shared textures.
 - `Game.dispose()` removes the ticker callback, the `blur` / `visibilitychange` listeners and the keyboard listeners, and clears end-of-match listeners. `MatchScreen` also disconnects the `ResizeObserver` and the pixel-ratio watcher and destroys the `Application`.
 
+## Sound
+
+`audio/soundMap.ts` is a pure mapping from a frame's events to sound cues (unit-tested): a 3-shot broadside is one boom, identical cues in a frame collapse, enemy fire is quieter than the player's. `AudioEngine` wraps Web Audio: files are fetched and decoded in the background and cached for the visit; every failure (no Web Audio, blocked autoplay, a file that does not load) is swallowed so sound can never break the game or print console errors. `GameAudio` adds the match-level cues (start, score, low hull, 10-second warning, pause/resume, end) and two loops: ocean ambience, and a sailing loop whose volume follows the ship's speed. Loops fade out while paused and when the match ends. The audio context is created after the Play click (a user gesture), so autoplay policies allow it. Mute (HUD button or `M`, only captured on the match screen) is persisted in `pirate-battle:sound:v1`.
+
 ## Local persistence
 
 All in `localStorage`, read defensively (corrupt or missing data falls back to defaults; every access is in try/catch so blocked storage never breaks the game):
@@ -80,6 +87,7 @@ All in `localStorage`, read defensively (corrupt or missing data falls back to d
 | `pirate-battle:pending:v1` | finished matches not yet confirmed by the server |
 | `pirate-battle:mock-db:v1` | the mock server's confirmed records |
 | `pirate-battle:mock-settings:v1` | selected network scenario, seed, latency scale |
+| `pirate-battle:sound:v1` | sound on/off |
 
 An abandoned match never reaches storage.
 
@@ -113,5 +121,4 @@ Handlers, fixtures and the in-page database (`mocks/`) are the same code in deve
 - Circles approximate islands; the art is slightly larger than the collision radius so shores never look clipped.
 - The simulation is not interpolated between fixed steps: at refresh rates above 60 Hz motion is still smooth because the step is small, but frames may repeat the same state. Interpolation is the obvious next step if a high-refresh display shows judder.
 - Density-specific textures are picked when assets load; a later devicePixelRatio change re-renders at the new resolution but keeps the loaded art.
-- Sound effects exist in the asset pack but are not wired in; the challenge does not require audio.
 - Baseline screenshots were generated on Windows with Chromium; regenerate them on another platform.

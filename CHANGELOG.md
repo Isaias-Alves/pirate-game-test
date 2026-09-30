@@ -8,7 +8,11 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 - Published at https://pirate-game-test.vercel.app (Vercel). Checked on the live site: the MSW service worker controls the page, lists load, failure scenarios show retries and recover, and a match recorded under "Recording unavailable" is kept, re-sent after a reload and listed once.
 - `npm run profile:heap` ([scripts/heap-diff.mjs](scripts/heap-diff.mjs)): heap-snapshot diff between cycle 10 and cycle 25. [docs/PERFORMANCE.md](docs/PERFORMANCE.md) now explains the residual heap slope: compiled code and browser-held request/performance records; no game, Pixi, query or audio object accumulates.
 
+### Added (accessibility)
+- `e2e/a11y.spec.ts`: axe WCAG 2.1 A/AA scan (dev dependency `@axe-core/playwright`) of the menu tabs, options with validation errors, HUD, pause and result, on desktop and mobile; plus a measured contrast check for the text axe cannot evaluate because it sits on sprite art or gradients.
+
 ### Fixed
+- Primary (gold) button text measured 4.2–4.4:1 at the 17–19 px used on short screens (below the 4.5:1 AA minimum); it now uses `--ink-deep` (#2a1606, ~4.9:1).
 - Ship separation could leave an enemy overlapping an island, or outside the arena, for one step when another ship pushed it; the arena and island limits are now applied again after separation (new unit test).
 
 ### Changed

@@ -14,6 +14,8 @@
   --cream: #fdf1d3;
   --cream-dim: #d9c9a3;
   --ink: #3a230f;
+  /* Button text on the gold sprite: #3a230f measured 4.2:1 at the 17–19 px used on short screens; this is ~4.9:1. */
+  --ink-deep: #2a1606;
   --danger: #ff8f7a;
   --ok: #8fe08a;
 
@@ -106,7 +108,7 @@ canvas {
   height: 88px;
   max-width: 100%;
   padding: 0 32px 4px;
-  color: var(--ink);
+  color: var(--ink-deep);
   font: 400 28px / 1 var(--font-display);
   letter-spacing: 0.03em;
   text-shadow: 0 1px 0 rgb(255 255 255 / 0.45);

@@ -111,6 +111,7 @@ Handlers, fixtures and the in-page database (`mocks/`) are the same code in deve
 
 - **Vitest** covers the rules in isolation because they are pure: movement, bounds, islands, weapons, cooldowns, projectile lifecycle, enemy AI, spawner constraints, scoring, freezing at the end, options validation, the mock database and the stale-response guard.
 - **Playwright** covers behaviour in a real browser against an optimized build made in `--mode e2e`. It presses real keys and touches real buttons. The only instrumentation is a manual simulation clock (the wall-clock ticker stops stepping; `window.__game.advance(s)` moves time by an exact amount), a seed, and reading state back; these hooks exist only in dev and in `--mode e2e` builds. One test makes the hull durable purely to observe the timer ending.
+- **Accessibility** (`e2e/a11y.spec.ts`): axe (WCAG 2.1 A/AA) on the menu tabs, options with errors, HUD, pause and result. axe cannot compute contrast over background images, and every panel and button here is sprite art, so for each text element axe leaves undetermined the test hides the text, screenshots what is behind it and checks the WCAG ratio against the median background pixel. This found the gold buttons at 4.2:1 on short screens; their text colour is now `--ink-deep` (~4.9:1).
 - Failures the suite found and that were fixed are listed in [PROGRESS.md](PROGRESS.md) (phase 13).
 
 ## Balance decisions and limitations

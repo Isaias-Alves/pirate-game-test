@@ -7,6 +7,7 @@ Built with **React + TypeScript (strict)** for the UI, **PixiJS** for the game s
 - **Live demo: https://pirate-game-test.vercel.app** (Vercel; the mock API runs there through the MSW service worker)
 - Architecture and decisions: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Performance and memory report: [docs/PERFORMANCE.md](docs/PERFORMANCE.md)
+- Version history: [CHANGELOG.md](CHANGELOG.md) (git tags `v1.0.0`, `v1.1.0`, …)
 - Living build log: [PROGRESS.md](PROGRESS.md)
 
 ## Setup
@@ -93,7 +94,7 @@ Every balance value is in [`src/game/gameConfig.ts`](src/game/gameConfig.ts), a 
 
 There is no real backend. `GET /api/ranking`, `GET /api/players/:id/matches` and `POST /api/matches` are answered by **MSW through a service worker**, in development, in tests and in the published build. Confirmed matches and pending submissions are kept in `localStorage`, so they survive refreshes.
 
-- The ranking compares only matches that used the **same settings**. It opens on your current Options; the **Setup** picker above the table browses other setups (Quick, Standard, Marathon, Swarm, Calm). Ordered by score, then a full-time finish over a sinking, then the earlier match, then match id (a total, deterministic order). Other players are deterministic fixtures.
+- The ranking compares only matches that used the **same settings**. It opens on your current Options; the **Setup** picker above the table browses other setups (Quick, Standard, Marathon, Swarm, Calm). Ordered by score, then a full-time finish over a sinking, then the earlier match, then match id (a total, deterministic order). Other players are deterministic fixtures; your own matches are listed as **You** and highlighted.
 - A finished match is stored locally **before** it is sent. It carries a client-generated `matchId`; the mock server treats it as an idempotency key, so retries, double clicks, timeouts after saving and reloads never create a second record.
 - Once recorded, the result screen shows the match position in the ranking for its setup (e.g. `#12 of 35`).
 - If sending fails the result screen says so and offers **Try again**; the main menu shows a banner (**Send now**) while anything is unrecorded. You can start another match meanwhile.
@@ -126,10 +127,11 @@ Reproduce a run without the UI: `?scenario=submit-timeout&seed=7&latency=0` (`la
 1. *Load failure*: choose "HTTP 5xx" (or "Connection failure", "Timeout"); the Ranking and Match History tabs show an error with **Try again**.
 2. *Late reply / recovery without duplicates*: choose "Timeout after saving", finish a match, wait for "Could not record this match", switch to "Success", press **Try again**: one record, no duplicate.
 3. *Unavailable at the end of a match*: choose "Recording unavailable", finish a match, reload the page (the menu shows the pending banner), switch to "Success", press **Send now**.
+4. *Asset load failure*: open DevTools → Network → **Block request URL** and add `*ship_*.png`, then press **Play**: the match screen shows an alert with **Retry** and combat does not start. Remove the block and press **Retry**: the match starts (files that did load are not downloaded again).
 
 ## Testing
 
-- **Unit (Vitest)**: pure simulation (movement, collisions, weapons, projectile lifecycle, enemy AI, spawner, scoring, match end), options validation, mock database, endpoints, stale-response guard.
+- **Unit (Vitest)**: pure simulation (movement, collisions, weapons, projectile lifecycle, enemy AI and ship separation, spawner, scoring, match end), damage-stage rules, sound cue mapping and loop scheduling, match store notifications, options validation, mock database, the Axios endpoints against the MSW handlers (idempotent replay, rejected input, ranking order), stale-response guard, list retry text, ranking setups.
 - **End-to-end (Playwright, Chromium desktop + mobile)**: the twelve required flows — options, asset loading / failure / retry, movement / bounds / islands, weapons / damage / cooldown / score, Chaser / Shooter / spawn interval, ending by time and death and clean restart, pause and focus loss, result and its persistence, abandoning / repeated navigation / touch controls, ranking and history paging with loading / empty / error, recording and recovery of pending matches, and timeouts / duplicates / out-of-order replies. Visual baselines: menu (top and bottom), arena, arena with damaged ships, arena with touch controls, pause, result, options.
 - **Report of the last full run**: [docs/test-report/index.html](docs/test-report/index.html) — 192 tests, all passing (96 per project, desktop and mobile Chromium, including the accessibility scan), 2026-09-30. Open it with `npx playwright show-report docs/test-report`; a fresh run writes `playwright-report/` (with traces of any failure).
 - **Accessibility**: an axe scan (WCAG 2.1 A/AA) of menu, options, HUD, pause and result on desktop and mobile, plus a measured contrast check for text over sprite art (which axe cannot evaluate).
@@ -139,8 +141,24 @@ Reproduce a run without the UI: `?scenario=submit-timeout&seed=7&latency=0` (`la
 
 The output of `npm run build` is a static site (`dist/`). For Vercel: import the repository, framework preset "Vite", build command `npm run build`, output directory `dist`. The MSW worker (`mockServiceWorker.js`) is copied from `public/` automatically, so the mock API runs on the published site. Netlify and Cloudflare Pages work the same way. The published build lives at https://pirate-game-test.vercel.app (Vercel defaults: preset Vite, `npm run build`, output `dist`, Node 22.x, no environment variables).
 
+## Timeline
+
+**Estimate: 2 days** — the full challenge window (brief received 2026-09-29 15:43 BRT, due 2026-10-01 15:43 BRT). Actual milestones, from the git history:
+
+| When (BRT) | Milestone |
+| --- | --- |
+| 2026-09-29 19:08 | First commit (scaffold) |
+| 2026-09-29 22:24 | `v1.0.0` — every gameplay, data, test and documentation requirement implemented |
+| 2026-09-30 17:45 | `v1.1.0` — UI improvement track (fire on damaged ships, health legibility, arena framing, sound, ranking setup picker, rank on the result screen, retry feedback, pause controls reminder), re-profiled |
+| 2026-09-30 18:06 | Deployed to Vercel and verified on the live URL |
+| 2026-09-30 20:12 | `v1.1.1` — compliance audit fixes, accessibility spec, heap-snapshot diff |
+| 2026-09-30 | `v1.1.2` — audio loop scheduling fix, stress and DPR 2 profiling, documentation pass, final test report |
+
+Per-version details are in [CHANGELOG.md](CHANGELOG.md).
+
 ## Credits and licences
 
-- Game art, UI atlas and sounds: the provided challenge asset pack (`assets/`).
+- Game art, UI atlas and sounds: the provided challenge asset pack (`assets/`), used unmodified.
+- HUD speaker icon: an inline SVG drawn for this project (the pack has no sound icon), styled after the atlas icons.
 - Font **Lilita One** (© 2011 Juan Montoreano), served through `@fontsource/lilita-one`, under the SIL Open Font License 1.1 — see [licenses/OFL-Lilita-One.txt](licenses/OFL-Lilita-One.txt).
-- Third-party libraries keep their own licences (React, PixiJS, TanStack Query, Axios, MSW, Playwright, Vite, Vitest).
+- Third-party libraries keep their own licences (React, PixiJS, TanStack Query, Axios, MSW, Playwright, axe-core, Vite, Vitest); see `package.json` and `node_modules/*/LICENSE`.

@@ -15,8 +15,8 @@ Measured with `npm run profile` ([scripts/profile.mjs](../scripts/profile.mjs));
 | Build | optimized production bundle (`vite build --mode e2e`), served by `vite preview` |
 | Match | 180 s session, enemy spawn every 3 s (defaults otherwise), fixed seed, hull made durable so the whole match is played |
 | Input | scripted: sails, turns and fires all cannons in rotating patterns for the full match |
-| Version | 1.1.0 (includes the UI track: sound, fire on damaged ships, outer sea), measured 2026-09-30 |
-| Background load | not a quiet machine: a game launcher and a chat app were open, CPU at ~37% before the run |
+| Version | 1.1.2, the delivered code (sound, fire on damaged ships, outer sea included), measured 2026-09-30 21:18 BRT |
+| Background load | not a quiet machine: a chat app was open, CPU at ~42% before the run |
 
 ## Frame rate — one full three-minute match
 
@@ -24,18 +24,18 @@ Source: [profiling/results.json](profiling/results.json)
 
 | Metric | Result |
 | --- | --- |
-| Wall-clock time / simulated time | 180.0 s / 180.0 s |
-| Frames sampled | 10 794 |
+| Wall-clock time / simulated time | 181.5 s / 180.0 s |
+| Frames sampled | 10 884 |
 | **Average FPS** | **60.0** |
 | Frame time mean / p50 | 16.67 ms / 16.7 ms |
 | **Frame time p95** | **16.7 ms** |
-| p99 / max | 16.8 ms / 33.4 ms |
-| Frames over 20 ms | 1 (one missed vsync, at 150.7 s) |
-| Frames over 33 ms | 1 (the same frame, 33.4 ms) |
-| **Entities on screen** (player + enemies + projectiles) | average 11.0, maximum 18 (up to 11 enemies, 10 projectiles) |
-| Result of the match | ended by time, 26 ships sunk |
+| p99 / max | 16.8 ms / 16.8 ms |
+| Frames over 20 ms | 0 |
+| Frames over 33 ms | 0 |
+| **Entities on screen** (player + enemies + projectiles) | average 11.0, maximum 18 (up to 11 enemies, 9 projectiles) |
+| Result of the match | ended by time, 25 ships sunk |
 
-An earlier run the same afternoon ([profiling/results-previous-run.json](profiling/results-previous-run.json)) had the same average, p50, p95 and p99, plus **one 150 ms frame**; the script now logs when each long frame happens, and the repeat run above did not reproduce it. With other apps competing for the CPU and GPU, a single stall like that is most likely outside the game, but it is reported rather than hidden. The 1.0.0 run on the same machine had no frame over 16.8 ms.
+Earlier full runs on the same machine gave the same average, p50, p95 and p99: 1.0.0 had no frame over 16.8 ms; of two 1.1.0 runs, one ([profiling/results-previous-run.json](profiling/results-previous-run.json)) had **a single 150 ms frame** while other apps were competing for the CPU and GPU, and the other had one missed vsync (33.4 ms). Neither stall was reproduced, here or in the stress runs below; the script logs when each long frame happens (`longFrames`) so a repeating stall would be visible.
 
 The 60 FPS target is met with the display's refresh rate as the ceiling (every frame lands on the 16.7 ms vsync interval). Because the game is single-scene and the entity count stays small, the workload is far below what the GPU can do; a higher-refresh display would run proportionally faster.
 
@@ -60,15 +60,15 @@ Each cycle: start a match, play 60 simulated seconds with sailing and firing (fa
 
 | Cycle | JS heap after leaving (MB) | DOM nodes | Event listeners | Canvases left |
 | --- | ---: | ---: | ---: | ---: |
-| baseline (menu) | 6.28 | 425 | 182 | – |
-| 1 | 7.57 | 426 | 189 | 0 |
-| 2 | 7.78 | 426 | 189 | 0 |
-| 3 | 7.97 | 426 | 189 | 0 |
+| baseline (menu) | 6.17 | 423 | 176 | – |
+| 1 | 7.59 | 426 | 189 | 0 |
+| 2 | 7.81 | 426 | 189 | 0 |
+| 3 | 8.00 | 426 | 189 | 0 |
 | 4 | 8.18 | 426 | 189 | 0 |
-| 5 | 8.30 | 426 | 189 | 0 |
+| 5 | 8.29 | 426 | 189 | 0 |
 
 - DOM nodes, event listeners and canvases are **flat** from the first cycle on: the disposal path (ticker callback, window/document listeners, keyboard listeners, resize/pixel-ratio watchers, scene graph, Pixi `Application`) releases what it creates.
-- The JS heap rises by about 0.18 MB per cycle in the first cycles (the menu itself has ~50 more DOM nodes than at 1.0.0: setup picker, sound legend row). To check whether that is a leak, the same test was run for **25 cycles** ([profiling/results-25-cycles.json](profiling/results-25-cycles.json)): the heap climbs from 7.4 MB to 8.7 MB by cycle 11 — one-off warm-up of library caches (Pixi, TanStack Query, MSW, the texture cache reused by every match) — and then almost levels off: +0.3 MB over the next 14 cycles (8.73 → 9.03 MB, about 20 KB per match), while DOM nodes (410), listeners (189) and leftover canvases (0) stay exactly flat. The residual slope was investigated with a heap-snapshot diff (next section): it is not game state.
+- The JS heap rises by about 0.18 MB per cycle in the first cycles (the menu itself has ~50 more DOM nodes than at 1.0.0: setup picker, sound legend row). To check whether that is a leak, the same test was run for **25 cycles** ([profiling/results-25-cycles.json](profiling/results-25-cycles.json)): the heap climbs from 7.4 MB to 8.7 MB by cycle 11 — one-off warm-up of library caches (Pixi, TanStack Query, MSW, the texture cache reused by every match) — and then almost levels off: +0.3 MB over the next 14 cycles (8.72 → 9.04 MB, about 23 KB per match), while DOM nodes (410), listeners (189) and leftover canvases (0) stay exactly flat. The residual slope was investigated with a heap-snapshot diff (next section): it is not game state.
 
 ### What the residual growth is — heap-snapshot diff
 
@@ -76,13 +76,13 @@ Each cycle: start a match, play 60 simulated seconds with sailing and firing (fa
 
 | Growth over 15 cycles | Size | What it is |
 | --- | ---: | --- |
-| Compiled code (`code`) | +198 KB | V8 bytecode and optimised code for functions that warm up over time; bounded by the size of the app |
-| Strings (78, ~1 KB each, the size of a list response), `NetworkResourcesData`, `MessagePort`, `ReadableStream` | ~+100 KB | Records of the two list requests made each time the menu reopens (33 in total): the counts match the requests, and they are held by the DevTools network capture that the profiler itself attaches and by one MSW message channel per request |
-| V8 internals (`WeakArrayList`, object shapes) | ~+35 KB | Engine bookkeeping that grows with compiled code |
-| `LayoutShift`, `LargestContentfulPaint`, `InteractionContentfulPaint`, `DOMRectReadOnly` | ~+30 KB | Performance-timeline entries buffered by the browser (buffers are capped) |
+| Compiled code (`code`) | +191 KB | V8 bytecode and optimised code for functions that warm up over time; bounded by the size of the app |
+| Strings (70, ~1 KB each, the size of a list response), `NetworkResourcesData`, `MessagePort`, `ReadableStream` | ~+100 KB | Records of the two list requests made each time the menu reopens (34 in total): the counts match the requests, and they are held by the DevTools network capture that the profiler itself attaches and by one MSW message channel per request |
+| V8 internals (`WeakArrayList`, object shapes) | ~+32 KB | Engine bookkeeping that grows with compiled code |
+| `LayoutShift` (+attributions), `PerformanceResourceTiming`, `LargestContentfulPaint`, `InteractionContentfulPaint`, `DOMRectReadOnly` | ~+28 KB | Performance-timeline entries buffered by the browser (buffers are capped) |
 | **Game, Pixi, TanStack Query and audio classes** (Sprite, Container, Graphics, Texture, Game, Simulation, Renderer, AudioContext, Query…) | **0** | No count changes at all between cycle 10 and cycle 25 |
 
-So about 27 KB per cycle in this harness comes from the JavaScript engine and the browser, and part of it (the DevTools capture) does not exist for a normal visitor. Nothing that a match creates survives it.
+So about 26 KB per cycle in this harness comes from the JavaScript engine and the browser, and part of it (the DevTools capture) does not exist for a normal visitor. Nothing that a match creates survives it.
 
 The diff also led to one clean-up that did not change these numbers: Pixi 8 frees a `Graphics` object's own geometry context only on a bare `destroy()`, so the health-bar masks, arena edge and effects are now destroyed with `{ children: true, context: true }` instead of waiting for Pixi's resource collector.
 

@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-09-30T20:44:15.412Z",
+  "measuredAt": "2026-10-01T00:19:17.765Z",
   "environment": {
     "os": "Windows_NT 10.0.26200 (x64)",
     "cpu": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz x6",
@@ -14,9 +14,9 @@
     "spawnInterval": 3
   },
   "frameStats": {
-    "wallSeconds": 3.7,
-    "simSeconds": 3.8,
-    "frames": 217,
+    "wallSeconds": 3.6,
+    "simSeconds": 3.7,
+    "frames": 214,
     "avgFps": 60,
     "frameMs": {
       "mean": 16.67,
@@ -39,7 +39,7 @@
   },
   "memory": {
     "baseline": {
-      "jsHeapMB": 6.09,
+      "jsHeapMB": 6.06,
       "domNodes": 409,
       "listeners": 182,
       "documents": 1
@@ -52,7 +52,7 @@
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 7.84
+        "heapDuringMatchMB": 7.94
       },
       {
         "cycle": 2,
@@ -61,16 +61,16 @@
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.15
+        "heapDuringMatchMB": 8.22
       },
       {
         "cycle": 3,
-        "jsHeapMB": 7.77,
+        "jsHeapMB": 7.79,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.33
+        "heapDuringMatchMB": 8.46
       },
       {
         "cycle": 4,
@@ -79,16 +79,16 @@
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.63
+        "heapDuringMatchMB": 8.45
       },
       {
         "cycle": 5,
-        "jsHeapMB": 8.08,
+        "jsHeapMB": 8.06,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.78
+        "heapDuringMatchMB": 8.85
       },
       {
         "cycle": 6,
@@ -97,25 +97,25 @@
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.83
+        "heapDuringMatchMB": 8.84
       },
       {
         "cycle": 7,
-        "jsHeapMB": 8.15,
+        "jsHeapMB": 8.17,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.9
+        "heapDuringMatchMB": 8.86
       },
       {
         "cycle": 8,
-        "jsHeapMB": 8.33,
+        "jsHeapMB": 8.36,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.9
+        "heapDuringMatchMB": 8.83
       },
       {
         "cycle": 9,
@@ -124,20 +124,38 @@
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.3
+        "heapDuringMatchMB": 9.36
       },
       {
         "cycle": 10,
-        "jsHeapMB": 8.69,
+        "jsHeapMB": 8.7,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.49
+        "heapDuringMatchMB": 9.31
       },
       {
         "cycle": 11,
-        "jsHeapMB": 8.73,
+        "jsHeapMB": 8.72,
+        "domNodes": 410,
+        "listeners": 189,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.55
+      },
+      {
+        "cycle": 12,
+        "jsHeapMB": 8.76,
+        "domNodes": 410,
+        "listeners": 189,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.48
+      },
+      {
+        "cycle": 13,
+        "jsHeapMB": 8.78,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
@@ -145,52 +163,25 @@
         "heapDuringMatchMB": 9.47
       },
       {
-        "cycle": 12,
-        "jsHeapMB": 8.74,
-        "domNodes": 410,
-        "listeners": 189,
-        "documents": 1,
-        "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.44
-      },
-      {
-        "cycle": 13,
-        "jsHeapMB": 8.77,
-        "domNodes": 410,
-        "listeners": 189,
-        "documents": 1,
-        "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.5
-      },
-      {
         "cycle": 14,
-        "jsHeapMB": 8.78,
-        "domNodes": 410,
-        "listeners": 189,
-        "documents": 1,
-        "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.5
-      },
-      {
-        "cycle": 15,
         "jsHeapMB": 8.8,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.44
+        "heapDuringMatchMB": 9.54
       },
       {
-        "cycle": 16,
+        "cycle": 15,
         "jsHeapMB": 8.81,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.62
+        "heapDuringMatchMB": 9.61
       },
       {
-        "cycle": 17,
+        "cycle": 16,
         "jsHeapMB": 8.82,
         "domNodes": 410,
         "listeners": 189,
@@ -199,62 +190,62 @@
         "heapDuringMatchMB": 9.56
       },
       {
-        "cycle": 18,
-        "jsHeapMB": 8.85,
+        "cycle": 17,
+        "jsHeapMB": 8.83,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.65
+        "heapDuringMatchMB": 9.53
+      },
+      {
+        "cycle": 18,
+        "jsHeapMB": 8.84,
+        "domNodes": 410,
+        "listeners": 189,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.6
       },
       {
         "cycle": 19,
-        "jsHeapMB": 8.85,
+        "jsHeapMB": 8.87,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.59
+        "heapDuringMatchMB": 9.56
       },
       {
         "cycle": 20,
-        "jsHeapMB": 8.89,
+        "jsHeapMB": 8.91,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.72
+        "heapDuringMatchMB": 9.66
       },
       {
         "cycle": 21,
-        "jsHeapMB": 8.96,
+        "jsHeapMB": 8.97,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.67
+        "heapDuringMatchMB": 9.77
       },
       {
         "cycle": 22,
-        "jsHeapMB": 8.96,
+        "jsHeapMB": 8.98,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.78
+        "heapDuringMatchMB": 9.61
       },
       {
         "cycle": 23,
-        "jsHeapMB": 9,
-        "domNodes": 410,
-        "listeners": 189,
-        "documents": 1,
-        "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.71
-      },
-      {
-        "cycle": 24,
-        "jsHeapMB": 9,
+        "jsHeapMB": 9.01,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
@@ -262,13 +253,22 @@
         "heapDuringMatchMB": 9.79
       },
       {
-        "cycle": 25,
-        "jsHeapMB": 9.03,
+        "cycle": 24,
+        "jsHeapMB": 9.01,
         "domNodes": 410,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.74
+        "heapDuringMatchMB": 9.73
+      },
+      {
+        "cycle": 25,
+        "jsHeapMB": 9.04,
+        "domNodes": 410,
+        "listeners": 189,
+        "documents": 1,
+        "canvasesAfterLeaving": 0,
+        "heapDuringMatchMB": 9.7
       }
     ]
   }

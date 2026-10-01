@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-09-30T20:42:38.828Z",
+  "measuredAt": "2026-10-01T00:18:25.717Z",
   "environment": {
     "os": "Windows_NT 10.0.26200 (x64)",
     "cpu": "Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz x6",
@@ -14,68 +14,63 @@
     "spawnInterval": 3
   },
   "frameStats": {
-    "wallSeconds": 180,
+    "wallSeconds": 181.5,
     "simSeconds": 180,
-    "frames": 10794,
+    "frames": 10884,
     "avgFps": 60,
     "frameMs": {
       "mean": 16.67,
       "p50": 16.7,
       "p95": 16.7,
       "p99": 16.8,
-      "max": 33.4
+      "max": 16.8
     },
-    "framesOver20ms": 1,
-    "framesOver33ms": 1,
-    "longFrames": [
-      {
-        "atSecond": 150.7,
-        "ms": 33.4
-      }
-    ],
+    "framesOver20ms": 0,
+    "framesOver33ms": 0,
+    "longFrames": [],
     "entities": {
       "avg": 11,
       "max": 18,
       "maxEnemies": 11,
-      "maxProjectiles": 10
+      "maxProjectiles": 9
     },
     "endPhase": "ended",
-    "score": 26
+    "score": 25
   },
   "memory": {
     "baseline": {
-      "jsHeapMB": 6.28,
-      "domNodes": 425,
-      "listeners": 182,
+      "jsHeapMB": 6.17,
+      "domNodes": 423,
+      "listeners": 176,
       "documents": 1
     },
     "cycles": [
       {
         "cycle": 1,
-        "jsHeapMB": 7.57,
+        "jsHeapMB": 7.59,
         "domNodes": 426,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.3
+        "heapDuringMatchMB": 8.24
       },
       {
         "cycle": 2,
-        "jsHeapMB": 7.78,
+        "jsHeapMB": 7.81,
         "domNodes": 426,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.53
+        "heapDuringMatchMB": 8.57
       },
       {
         "cycle": 3,
-        "jsHeapMB": 7.97,
+        "jsHeapMB": 8,
         "domNodes": 426,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.76
+        "heapDuringMatchMB": 8.72
       },
       {
         "cycle": 4,
@@ -84,16 +79,16 @@
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 8.88
+        "heapDuringMatchMB": 8.96
       },
       {
         "cycle": 5,
-        "jsHeapMB": 8.3,
+        "jsHeapMB": 8.29,
         "domNodes": 426,
         "listeners": 189,
         "documents": 1,
         "canvasesAfterLeaving": 0,
-        "heapDuringMatchMB": 9.04
+        "heapDuringMatchMB": 9.07
       }
     ]
   }

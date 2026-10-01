@@ -4,12 +4,22 @@ All notable changes to Pirate Battle. Versions are git tags (`git checkout v1.0.
 
 ## [Unreleased]
 
+## [1.1.2] — 2026-09-30
+
+Final pass before delivery: a second bug/bottleneck review, a documentation review against the brief, and every report regenerated on the delivered code. Full suite 192/192 and unit 96/96; the test report and the profiling in `docs/` were produced on this code.
+
 ### Added
 - Profiler options `PROFILE_DPR` and `PROFILE_SPAWN`. Stress run at the heaviest allowed setting (enemy every 0.5 s: 93 entities at once) and a DPR 2 run both hold 60 FPS with a 16.7–16.8 ms p95; documented in docs/PERFORMANCE.md.
 
 ### Fixed
 - The sailing and ambience loops re-scheduled their volume on every frame (60 Web Audio automation events a second even at a steady speed); a loop is now re-scheduled only when its target volume changes by an audible amount (unit test with a fake AudioContext: 121 events over 2 s before, 0 after).
 - The screen-reader hull meter used a hard-coded 0.3 for its "low" mark instead of `gameConfig.feedback.lowHealthFraction`.
+
+### Documentation
+- CLAUDE.md translated to English (the brief requires the solution documentation in English; CHALLENGE.md stays the original brief).
+- README: timeline (2-day estimate and the milestones from the git history), step-by-step reproduction of an asset load failure, CHANGELOG link, accurate unit-test list, credits for the drawn speaker icon and axe-core.
+- ARCHITECTURE: cache lifetime, timeout and retry policy with the retry feedback, ranking setup picker, mute state in the published snapshot.
+- PERFORMANCE: re-profiled on the delivered code (3-minute match: 60 FPS, p95 16.7 ms, worst frame 16.8 ms; 5 and 25 cycles; heap-snapshot diff).
 
 ## [1.1.1] — 2026-09-30
 

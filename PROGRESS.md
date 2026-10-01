@@ -107,3 +107,9 @@ Feature-complete except deploy. See CHANGELOG.md. Next: UI improvement track UI-
 - Gotcha: `getComputedStyle` is live — read values before mutating classes (first contrast run reported 1.00:1 everywhere).
 - Full suite 192/192 (26.5 min, PW_SLOW); report refreshed in `docs/test-report/`; released as v1.1.1 (tag).
 - Second review pass (bugs/bottlenecks): audio loops re-scheduled `setTargetAtTime` every frame → now only on audible change (AudioEngine.test.ts); LiveStatus meter used literal 0.3 → config. Reviewed renderer, effects, loader, store, HUD, touch, options/storage, mocks, lists, result: no other defect found. Considered and skipped: Back-button handling on mobile (leaving the page already abandons the match, as the challenge requires).
+
+## ▶ 2026-09-30 (night) — final pass, v1.1.2
+- Second bug/bottleneck review: audio loops re-scheduled every frame (fixed + unit test), LiveStatus literal 0.3 → config. Stress (spawn 0.5 s, 93 entities) and DPR 2 runs: 60 FPS.
+- Documentation review against §11: CLAUDE.md translated to English (owner's choice), README timeline with the 2-day estimate (owner's choice) + asset-failure reproduction + CHANGELOG link + credits, ARCHITECTURE cache/retry/setup picker.
+- Re-profiled the delivered code (main 3-min run, 5 and 25 cycles, heap diff). Full suite 192/192 on `7204c57`; report copied to docs/test-report. Tagged v1.1.2.
+- Delivery checklist for the owner: send the repo URL + https://pirate-game-test.vercel.app before 2026-10-01 15:43 BRT; avoid pushing to main after sending (every push redeploys).

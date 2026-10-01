@@ -4,7 +4,7 @@ A top-down 2D naval shooter for the browser. Sail between islands, sink Chasers 
 
 Built with **React + TypeScript (strict)** for the UI, **PixiJS** for the game scene, **TanStack Query + Axios** for the ranking and match history, **MSW** for the mock REST API (also in the published build) and **Playwright** for end-to-end and visual-regression tests.
 
-- **Live demo: https://pirate-game-test.vercel.app** (Vercel; the mock API runs there through the MSW service worker)
+- **Live demo: [pirate-game-test.vercel.app](https://pirate-game-test.vercel.app)** (Vercel; the mock API runs there through the MSW service worker)
 - Architecture and decisions: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Performance and memory report: [docs/PERFORMANCE.md](docs/PERFORMANCE.md)
 - Version history: [CHANGELOG.md](CHANGELOG.md) (git tags `v1.0.0`, `v1.1.0`, …)
